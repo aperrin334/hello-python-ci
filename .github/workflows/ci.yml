@@ -15,13 +15,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: Setup Python
+      # Step 2: Setup Python (for build & tests on runner)
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      # Step 3: Install dependencies
+      # Step 3: Install dependencies (for tests on runner)
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -31,10 +31,42 @@ jobs:
       - name: Run tests
         run: pytest
 
-      # Step 5: Deploy locally
-      - name: Deploy app (localhost simulation)
+      # Step 5: Start SSH Agent (for remote steps)
+      - name: Start SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # Step 6: Copy project files to remote server
+      - name: Upload app to remote server
         run: |
-          echo "Starting app..."
-          nohup python app.py &
-          sleep 2
-          echo "App started on localhost"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "mkdir -p ~/hello-python-ci"
+          scp -o StrictHostKeyChecking=no app.py requirements.txt ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }}:~/hello-python-ci/ || true
+
+      # Step 7: Install Python & dependencies on remote
+      - name: Install Python and requirements on remote
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "
+            sudo apt-get update -y &&
+            sudo apt-get install -y python3 python3-pip &&
+            if [ -f ~/hello-python-ci/requirements.txt ] && [ -s ~/hello-python-ci/requirements.txt ]; then
+              pip3 install -r ~/hello-python-ci/requirements.txt
+            fi
+          "
+
+      # Step 8: Deploy app on remote (nohup-style like your localhost example)
+      - name: Deploy app (remote server)
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.REMOTE_USER }}@${{ secrets.REMOTE_HOST }} "
+            set -e
+            cd ~/hello-python-ci
+            # ensure a log file exists so the next command never fails
+            : > app.log
+            # start in background, unbuffered, append to log
+            nohup python3 -u app.py >> app.log 2>&1 &
+            # short wait so students can see output
+            sleep 3
+            echo 'App started on remote server'
+            echo '--- app.log ---'
+            tail -n +1 app.log || true
+          "

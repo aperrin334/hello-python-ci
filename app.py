@@ -9,6 +9,7 @@ db = SQLAlchemy(app)
 # Modèle pour la table User
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), unique=True, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -27,6 +28,7 @@ def home():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+        name=request.form['name']
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
@@ -34,10 +36,10 @@ def register():
         # Vérifier si l'utilisateur existe déjà
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
-            return "Username already exists. Please choose a different one."
+            return "Username déjà existant"
 
         # Créer un nouvel utilisateur
-        new_user = User(username=username, password=password, email=email)
+        new_user = User(name=name,username=username, password=password, email=email)
         db.session.add(new_user)
         db.session.commit()
 

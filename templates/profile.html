@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr"> <!-- page personnelle  -->
+<head>
+    <meta charset="UTF-8">
+    <title>Profil de {{ user.username }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+
+    <!-- 🔍 Barre de recherche -->
+    <form method="GET" action="{{ url_for('search') }}" class="d-flex mb-4">
+        <input class="form-control me-2" type="search" name="q" placeholder="Rechercher un profil..." aria-label="Search">
+        <button class="btn btn-outline-primary" type="submit">Rechercher</button>
+    </form>
+
+    <h2>👤 Profil de {{ user.name }}</h2>
+    <p><b>Nom d’utilisateur :</b> {{ user.username }}</p>
+    <p><b>Email :</b> {{ user.email }}</p>
+
+    <hr>
+
+    <h4>📝 Créer une publication</h4>
+    <form method="POST" action="{{ url_for('create_post') }}">
+        <div class="mb-3">
+            <textarea class="form-control" name="content" rows="3" placeholder="Écrivez quelque chose..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Publier</button>
+    </form>
+
+    <hr>
+
+    <h4>Vos publications</h4>
+    {% for post in posts %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <p>{{ post.content }}</p>
+                <small class="text-muted">
+                    Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}
+                </small>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-muted">Aucune publication pour le moment.</p>
+    {% endfor %}
+</div>
+
+</body>
+</html>

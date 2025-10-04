@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
-<<<<<<< HEAD
+
 from werkzeug.security import check_password_hash,generate_password_hash # Pour vérifier le hash du mot de passe
-=======
+
 from datetime import datetime
 import pytz
 PARIS = pytz.timezone('Europe/Paris')
->>>>>>> df51d5928571e7481c0d23cfdf8b8a5b0b22c806
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -94,10 +94,8 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
 
-<<<<<<< HEAD
 
 
-=======
 @app.route('/profile')
 def profile():
     if 'username' not in session:
@@ -148,6 +146,6 @@ def user_profile(username):
     return render_template('user_profile.html', user=user, posts=posts)
 
 # ------------------ EXECUTION ------------------
->>>>>>> df51d5928571e7481c0d23cfdf8b8a5b0b22c806
+
 if __name__ == '__main__':
     app.run(debug=True)

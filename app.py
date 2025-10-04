@@ -56,14 +56,22 @@ def login():
         password = request.form['password']
 
         # Vérifier si l'utilisateur existe et que le mot de passe est correct
-        user = User.query.filter_by(username=username, password=password).first()
-        if user:
+        user = User.query.filter_by(username=username).first()
+        
+        #Vérifie le nom d'utilisateur n'existe pas 
+        if not user:
+            flash( "Nom d'utilisateur n'existe pas.",'error')
+            return redirect(url_for('/login'))
+        #Sachant que le username est le bon, on vérifie le mot de passe   
+        elif password==user.password :
             session['username'] = username
             flash('Connexion réussie !', 'success')
             return redirect(url_for('profile'))
-        else:
-            return "Nom d'utilisateur ou mot de passe incorrect."
+        else :
+            flash('Mot de passe incorrect', 'error')
+            return redirect(url_for('/login'))
 
+    
     return render_template('login.html')
 
 @app.route('/profile')
@@ -78,6 +86,8 @@ def profile():
 def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)

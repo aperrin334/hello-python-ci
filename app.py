@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import check_password_hash,generate_password_hash # Pour vérifier le hash du mot de passe
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
@@ -61,15 +62,15 @@ def login():
         #Vérifie le nom d'utilisateur n'existe pas 
         if not user:
             flash( "Nom d'utilisateur n'existe pas.",'error')
-            return redirect(url_for('/login'))
+            return redirect(url_for('login'))
         #Sachant que le username est le bon, on vérifie le mot de passe   
-        elif password==user.password :
+        elif  user.username==username  and user.password==password:       #check_password_hash(user.password, password) :
             session['username'] = username
             flash('Connexion réussie !', 'success')
             return redirect(url_for('profile'))
         else :
             flash('Mot de passe incorrect', 'error')
-            return redirect(url_for('/login'))
+            return redirect(url_for('login'))
 
     
     return render_template('login.html')

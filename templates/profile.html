@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr"> <!-- page personnelle  -->
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Profil de {{ user.username }}</title>
@@ -9,13 +9,18 @@
 
 <div class="container mt-5">
 
+    <!-- 🔝 Barre du haut avec bouton de déconnexion -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>👤 Profil de {{ user.name }}</h2>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Se déconnecter</a>
+    </div>
+
     <!-- 🔍 Barre de recherche -->
     <form method="GET" action="{{ url_for('search') }}" class="d-flex mb-4">
         <input class="form-control me-2" type="search" name="q" placeholder="Rechercher un profil..." aria-label="Search">
         <button class="btn btn-outline-primary" type="submit">Rechercher</button>
     </form>
 
-    <h2>👤 Profil de {{ user.name }}</h2>
     <p><b>Nom d’utilisateur :</b> {{ user.username }}</p>
     <p><b>Email :</b> {{ user.email }}</p>
 

@@ -21,6 +21,13 @@
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        img.logo {
+            width: 240px;
+            margin-bottom: 20px;
         }
 
         h1 {
@@ -35,7 +42,7 @@
             font-size: 16px;
             font-weight: bold;
             color: #fff;
-            background-color: #007bff;
+            background-color: #dc3545; /* rouge vif */
             border: none;
             border-radius: 8px;
             text-decoration: none;
@@ -44,13 +51,14 @@
         }
 
         .btn:hover {
-            background-color: #0056b3;
+            background-color: #b02a37; /* rouge plus foncé au hover */
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bienvenue sur notre application</h1>
+        <img src="{{ url_for('static', filename='images/LOGO.png') }}" alt="Logo InsaGram" class="logo">
+        <h1>Bienvenue sur InsaGram</h1>
         <a href="/register" class="btn">S'inscrire</a>
         <a href="/login" class="btn">Se connecter</a>
     </div>

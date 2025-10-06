@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Profil de {{ user.username }}
+    <title>Profil de {{ user.name }}
     </title>
           <style>
         .alert {
@@ -62,6 +62,7 @@
         <button class="btn btn-outline-primary" type="submit">Rechercher</button>
     </form>
 
+    <p><b>Nom :</b> {{ user.name }}</p>
     <p><b>Nom d’utilisateur :</b> {{ user.username }}</p>
     <p><b>Email :</b> {{ user.email }}</p>
 

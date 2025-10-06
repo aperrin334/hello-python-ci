@@ -124,7 +124,6 @@ def create_post():
 
     return redirect(url_for('profile'))
 
-
 @app.route('/search', methods=['GET', 'POST'])
 def search():
     if 'username' not in session:
@@ -134,10 +133,11 @@ def search():
     results = []
 
     if query:
-        # Recherche les utilisateurs dont le nom contient le mot-clé
-        results = User.query.filter(User.username.ilike(f'%{query}%')).all()
+        # Recherche les utilisateurs dont le nom contient le mot-clé (insensible à la casse)
+        results = User.query.filter(User.name.ilike(f'%{query}%')).all()
 
     return render_template('search_results.html', query=query, results=results)
+
 
 @app.route('/user/<username>')
 def user_profile(username):

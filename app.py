@@ -80,7 +80,7 @@ def login():
         #Sachant que le username est le bon, on vérifie le mot de passe   
         elif  user.username==username  and user.password==password:       #check_password_hash(user.password, password) :
             session['username'] = username
-            flash('Connexion réussie !', 'success')
+            #flash('Connexion réussie !', 'success')
             return redirect(url_for('profile'))
         else :
             flash('Mot de passe incorrect', 'error')

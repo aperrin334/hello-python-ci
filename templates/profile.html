@@ -142,6 +142,10 @@
         <p><b>Nom :</b> {{ user.name }}</p>
         <p><b>Nom d’utilisateur :</b> {{ user.username }}</p>
         <p><b>Email :</b> {{ user.email }}</p>
+        <p>
+            <b>Followers :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
+            <b>Suivi(e)s :</b> <span class="badge bg-primary">{{ user.following_count }}</span>
+        </p>
 
         <hr>
 

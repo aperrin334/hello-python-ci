@@ -93,6 +93,19 @@
 
 <div class="main-content">
     <h2>👤 Profil de {{ user.name }}</h2>
+
+
+    <p>
+        <b>Followers :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
+        <b>Suivi(e)s :</b> <span class="badge bg-primary">{{ user.following_count }}</span>
+    </p>
+    {% if current_user and current_user.id != user.id %}
+         <form action="{% if current_user.is_following(user) %}{{ url_for('unfollow_user', user_id=user.id) }}{% else %}{{ url_for('follow_user', user_id=user.id) }}{% endif %}" method="POST" style="display:inline;">
+            <button type="submit" class="btn btn-sm {% if current_user.is_following(user) %}btn-outline-danger{% else %}btn-primary{% endif %}">
+                {% if current_user.is_following(user) %}Ne plus suivre{% else %}Suivre{% endif %}
+            </button>
+        </form>
+    {% endif %}
     <hr>
 
     <h4>🗒️ Publications</h4>

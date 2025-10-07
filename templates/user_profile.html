@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">    <!-- page d'un autre user  -->
-
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <title>Profil de {{ user.name }}</title>
@@ -11,20 +10,27 @@
     <a href="{{ url_for('profile') }}" class="btn btn-secondary mb-3">← Retour à mon profil</a>
 
     <h2>👤 Profil de {{ user.name }}</h2>
-
     <hr>
     <h4>🗒️ Publications</h4>
+    
     {% for post in posts %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <p>{{ post.content }}</p>
-                <small class="text-muted">
-                    Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}
-                </small>
-            </div>
+    <div class="card mb-3">
+        <div class="card-body">
+            <p>{{ post.content }}</p>
+            <small class="text-muted d-block mb-2">
+                Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}
+            </small>
+
+            {% if current_user %}
+                {% set liked = post.id in liked_post_ids %}
+                <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                        {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
+                    </button>
+                </form>
+            {% endif %}
         </div>
-    {% else %}
-        <p class="text-muted">Aucune publication pour le moment.</p>
+    </div>
     {% endfor %}
 </div>
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Compteur de caractères</title>
-  <link rel="stylesheet" href="style.css"> <!-- ton fichier CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
     /* Styles additionnels pour la zone de texte et le compteur */
     textarea {

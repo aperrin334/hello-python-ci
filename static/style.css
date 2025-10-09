@@ -3,6 +3,7 @@
    =========================== */
 :root {
   --background: #ece4d1ff;
+  --background-2: rgb(164, 240, 246);
   --bleu-ombre: #00485280;
   --bleu-1: #006d7cff;
   --bleu-2: #0098acff;
@@ -31,7 +32,7 @@ body {
 /* Boites */
 
 .container {
-  background:  linear-gradient(145deg, var(--bleu-1), var(--bleu-2));
+  background:  linear-gradient(145deg, var(--background-2), var(--background));
   padding: 40px;
   border-radius: var(--radius-md);
   box-shadow:

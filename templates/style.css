@@ -1,0 +1,112 @@
+/* ===========================
+   Palette et réglages globaux
+   =========================== */
+:root {
+  --background: #ece4d1ff;
+  --bleu-ombre: #00485280;
+  --bleu-1: #006d7cff;
+  --bleu-2: #0098acff;
+  --bleu-3: #00c7e153;
+  --vert-ombre: #193e0068;
+  --vert-1: #327c01ff;
+  --vert-2: #46b000ff;
+  --vert-3: #54d30046;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --soft: rgba(0,127,127,0.06);
+  --text: #062221ff;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Boites */
+
+.container {
+  background:  linear-gradient(145deg, var(--bleu-1), var(--bleu-2));
+  padding: 40px;
+  border-radius: var(--radius-md);
+  box-shadow:
+    8px 8px 20px rgba(0, 0, 0, 0.3),
+    -8px -8px 20px rgba(255, 255, 255, 0.1),
+    inset 2px 2px 8px rgba(255, 255, 255, 0.2),
+    inset -2px -2px 8px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.container:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    8px 8px 20px rgba(0, 0, 0, 0.3),
+    -8px -8px 20px rgba(255, 255, 255, 0.1),
+    inset 2px 2px 8px rgba(255, 255, 255, 0.2),
+    inset -2px -2px 8px rgba(0, 0, 0, 0.3);
+}
+
+img.logo {
+    width: 240px;
+    margin-bottom: 20px;
+}
+
+h1 {
+    margin-bottom: 30px;
+    color: var(--text);
+}
+
+/* BOUTON */
+.btn {
+background-color: var(--vert-2);
+color: white;
+padding: 12px 24px;
+border: none;
+border-radius: var(--radius-md);
+font-size: 16px;
+cursor: pointer;
+transition: background-color 0.3s, transform 0.2s;
+}
+
+/* Effet au survol */
+.btn:hover {
+background-color: var(--vert-1);
+transform: scale(1.05);
+}
+
+/* Effet quand le bouton est cliqué */
+.btn:active {
+background-color: var(--vert-1);
+transform: scale(0.95);
+}
+
+.alert {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+}
+.alert-success {
+    background-color: var(--vert-3);
+    color: var(--vert-2);
+    border: 1px solid (--vert-1);
+}
+
+
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--bleu-3);
+    font-size: 14px;
+    resize: none;
+    box-sizing: border-box;
+}

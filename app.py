@@ -17,10 +17,11 @@ db = SQLAlchemy(app)
 # ------------------ MODELES ------------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), unique=False, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    biography = db.Column(db.Text, nullable=True)  
     posts = db.relationship('Post', backref='author', lazy=True)
     
     def __repr__(self):
@@ -267,6 +268,19 @@ def user_profile(username):
         liked_post_ids=liked_post_ids,
         liked_comment_ids=liked_comment_ids
     )
+@app.route('/edit_biography', methods=['GET', 'POST'])
+def edit_biography():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    if request.method == 'POST':
+        user.biography = request.form.get('biography', '')
+        db.session.commit()
+        flash('Biographie mise à jour avec succès !', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('edit_biography.html', user=user)
 
 
 

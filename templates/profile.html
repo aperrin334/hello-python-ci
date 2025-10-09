@@ -19,11 +19,22 @@
             color: #4f8a10;
             border: 1px solid #4f8a10;
         }
+        .biography-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0d6efd;
+        }
+        .biography-text {
+            white-space: pre-line;
+            font-style: italic;
+            color: #495057;
+        }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body class="bg-light">
-
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     <div id="flash-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
@@ -42,13 +53,12 @@
           container.style.opacity = '0';
           setTimeout(() => container.remove(), 500);
         }
-      }, 3000); 
+      }, 3000);
     </script>
   {% endif %}
 {% endwith %}
 
 <div class="container mt-5">
-
     <!-- Barre du haut avec bouton de déconnexion -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>👤 Profil de {{ user.name }}</h2>
@@ -61,12 +71,31 @@
         <button class="btn btn-outline-primary" type="submit">Rechercher</button>
     </form>
 
-    <p><b>Nom :</b> {{ user.name }}</p>
-    <p><b>Nom d’utilisateur :</b> {{ user.username }}</p>
-    <p><b>Email :</b> {{ user.email }}</p>
+    <!-- Informations de base -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <p><b>Nom :</b> {{ user.name }}</p>
+            <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
+            <p><b>Email :</b> {{ user.email }}</p>
+        </div>
+    </div>
+
+    <!-- Section Biographie -->
+    <div class="biography-section">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0">📜 Ma biographie</h4>
+            <a href="{{ url_for('edit_biography') }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+        </div>
+        {% if user.biography %}
+            <p class="biography-text">{{ user.biography }}</p>
+        {% else %}
+            <p class="biography-text text-muted">Aucune biographie. <a href="{{ url_for('edit_biography') }}">Ajouter une biographie</a></p>
+        {% endif %}
+    </div>
 
     <hr>
 
+    <!-- Création de publication -->
     <h4>📝 Créer une publication</h4>
     <form method="POST" action="{{ url_for('create_post') }}">
         <div class="mb-3">
@@ -76,8 +105,9 @@
     </form>
 
     <hr>
-    <h4>Vos publications</h4>
 
+    <!-- Publications -->
+    <h4>Vos publications</h4>
     {% for post in posts %}
     <div class="card mb-3">
         <div class="card-body">
@@ -110,7 +140,6 @@
                     <b>{{ comment.author.name }}:</b> {{ comment.content }}
                     <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
                 </small>
-
                 {% if current_user %}
                     {% set liked_comment = comment.id in liked_comment_ids %}
                     <form action="{{ url_for('like_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
@@ -121,11 +150,9 @@
                 {% endif %}
             </div>
             {% endfor %}
-
         </div>
     </div>
     {% endfor %}
-
 </div>
 </body>
 </html>

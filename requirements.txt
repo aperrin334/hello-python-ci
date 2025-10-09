@@ -2,3 +2,6 @@ pytest
 flask
 flask_sqlalchemy
 werkzeug
+flask-testing
+pytest
+pytz

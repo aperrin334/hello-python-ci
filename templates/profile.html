@@ -59,11 +59,18 @@
 {% endwith %}
 
 <div class="container mt-5">
-    <!-- Barre du haut avec bouton de déconnexion -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>👤 Profil de {{ user.name }}</h2>
-        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Se déconnecter</a>
+    <!-- Barre du haut avec bouton de déconnexion avec le bouton supprimer le compte -->
+<div class="mb-4">
+    <div class="d-flex justify-content-end mb-2">
+        <a href="{{ url_for('delete_account') }}" class="btn btn-danger btn-sm me-2">
+            Supprimer mon compte
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">
+            Se déconnecter
+        </a>
     </div>
+    <h2>👤 Profil de {{ user.name }}</h2>
+</div>
 
     <!-- Barre de recherche -->
     <form method="GET" action="{{ url_for('search') }}" class="d-flex mb-4">
@@ -153,6 +160,7 @@
         </div>
     </div>
     {% endfor %}
+
 </div>
 </body>
 </html>

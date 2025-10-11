@@ -17,20 +17,51 @@ db = SQLAlchemy(app)
 # ------------------ MODELES ------------------
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), unique=False, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    biography = db.Column(db.Text, nullable=True)  
     posts = db.relationship('Post', backref='author', lazy=True)
     
     def __repr__(self):
         return f'<User {self.username}>'
-
+    
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     content = db.Column(db.String(255), nullable=False)
     date_posted = db.Column(db.DateTime, default=lambda: datetime.now(PARIS))
+    likes = db.relationship('Like', backref='post', lazy=True)
+    comments = db.relationship('Comment', backref='post', lazy=True)
+
+
+class Like(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    date_liked = db.Column(db.DateTime, default=lambda: datetime.now(PARIS))
+
+    # Un utilisateur ne peut liker un post qu'une seule fois
+    __table_args__ = (db.UniqueConstraint('user_id', 'post_id', name='unique_like'),)
+
+class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, db.ForeignKey('post.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.String(255), nullable=False)
+    date_posted = db.Column(db.DateTime, default=lambda: datetime.now(PARIS))
+    
+    # Relation vers l'auteur
+    author = db.relationship('User', backref='comments', lazy=True)
+    
+    likes = db.relationship('CommentLike', backref='comment', lazy=True)
+
+class CommentLike(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    comment_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date_liked = db.Column(db.DateTime, default=lambda: datetime.now(PARIS))
 
 #créer les bases de données qui ne le sont pas déjà
 with app.app_context():
@@ -95,15 +126,31 @@ def logout():
     return redirect(url_for('home'))
 
 
-
 @app.route('/profile')
 def profile():
     if 'username' not in session:
         return redirect(url_for('login'))
-    
-    user = User.query.filter_by(username=session['username']).first()
-    posts = Post.query.filter_by(user_id=user.id).order_by(Post.date_posted.desc()).all()
-    return render_template('profile.html', user=user, posts=posts)
+
+    current_user = User.query.filter_by(username=session['username']).first()
+    posts = Post.query.filter_by(user_id=current_user.id).order_by(Post.date_posted.desc()).all()
+
+    # Liste des posts likés
+    liked_post_ids = [like.post_id for like in Like.query.filter_by(user_id=current_user.id).all()]
+
+    # Liste des commentaires likés
+    liked_comment_ids = [like.comment_id for like in CommentLike.query.filter_by(user_id=current_user.id).all()]
+
+    return render_template(
+        'profile.html',
+        user=current_user,
+        posts=posts,
+        current_user=current_user,
+        liked_post_ids=liked_post_ids,
+        liked_comment_ids=liked_comment_ids
+    )
+
+
+
 
 @app.route('/create_post', methods=['POST'])
 def create_post():
@@ -124,6 +171,67 @@ def create_post():
 
     return redirect(url_for('profile'))
 
+@app.route('/like_post/<int:post_id>', methods=['POST'])
+def like_post(post_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    post = Post.query.get_or_404(post_id)
+
+    # Vérifier si l'utilisateur a déjà liké ce post
+    existing_like = Like.query.filter_by(user_id=user.id, post_id=post.id).first()
+
+    if existing_like:
+        # Si déjà liké, on supprime le like
+        db.session.delete(existing_like)
+    else:
+        # Sinon, on ajoute un like
+        new_like = Like(user_id=user.id, post_id=post.id)
+        db.session.add(new_like)
+
+    db.session.commit()
+    return redirect(request.referrer or url_for('profile'))
+
+    # Redirige vers la page précédente
+    return redirect(request.referrer or url_for('profile'))
+
+@app.route('/comment/<int:post_id>', methods=['POST'])
+def create_comment(post_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    post = Post.query.get_or_404(post_id)
+    content = request.form['content'].strip()
+
+    if not content:
+        flash('Le commentaire ne peut pas être vide.', 'warning')
+        return redirect(request.referrer or url_for('profile'))
+
+    comment = Comment(post_id=post.id, user_id=user.id, content=content)
+    db.session.add(comment)
+    db.session.commit()
+    return redirect(request.referrer or url_for('profile'))
+
+@app.route('/like_comment/<int:comment_id>', methods=['POST'])
+def like_comment(comment_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    comment = Comment.query.get_or_404(comment_id)
+
+    existing_like = CommentLike.query.filter_by(user_id=user.id, comment_id=comment.id).first()
+    if existing_like:
+        db.session.delete(existing_like)
+    else:
+        new_like = CommentLike(user_id=user.id, comment_id=comment.id)
+        db.session.add(new_like)
+
+    db.session.commit()
+    return redirect(request.referrer or url_for('profile'))
+
 
 @app.route('/search', methods=['GET', 'POST'])
 def search():
@@ -134,16 +242,47 @@ def search():
     results = []
 
     if query:
-        # Recherche les utilisateurs dont le nom contient le mot-clé
-        results = User.query.filter(User.username.ilike(f'%{query}%')).all()
+        # Recherche les utilisateurs dont le nom contient le mot-clé (insensible à la casse)
+        results = User.query.filter(User.name.ilike(f'%{query}%')).all()
 
     return render_template('search_results.html', query=query, results=results)
-
 @app.route('/user/<username>')
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
     posts = Post.query.filter_by(user_id=user.id).order_by(Post.date_posted.desc()).all()
-    return render_template('user_profile.html', user=user, posts=posts)
+
+    current_user = None
+    liked_post_ids = []
+    liked_comment_ids = []
+
+    if 'username' in session:
+        current_user = User.query.filter_by(username=session['username']).first()
+        liked_post_ids = [like.post_id for like in Like.query.filter_by(user_id=current_user.id).all()]
+        liked_comment_ids = [like.comment_id for like in CommentLike.query.filter_by(user_id=current_user.id).all()]
+
+    return render_template(
+        'user_profile.html',
+        user=user,
+        posts=posts,
+        current_user=current_user,
+        liked_post_ids=liked_post_ids,
+        liked_comment_ids=liked_comment_ids
+    )
+@app.route('/edit_biography', methods=['GET', 'POST'])
+def edit_biography():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    if request.method == 'POST':
+        user.biography = request.form.get('biography', '')
+        db.session.commit()
+        flash('Biographie mise à jour avec succès !', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('edit_biography.html', user=user)
+
+
 
 # ------------------ EXECUTION ------------------
 

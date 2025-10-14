@@ -26,10 +26,11 @@ followers = db.Table(
 #############
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80), unique=True, nullable=False)
+    name = db.Column(db.String(80), unique=False, nullable=False)
     username = db.Column(db.String(80), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    biography = db.Column(db.Text, nullable=True)  
     posts = db.relationship('Post', backref='author', lazy=True)
     
     followed = db.relationship(
@@ -132,7 +133,7 @@ def register():
         if existing_user:
             return "Username déjà existant"
         # Créer un nouvel utilisateur
-        new_user = User(name=name, username=username, password=password, email=email)
+        new_user = User(name=name, username=username, password=generate_password_hash(password), email=email)
         db.session.add(new_user)
         db.session.commit()
         flash('Inscription réussie !', 'success')
@@ -151,9 +152,9 @@ def login():
             flash( "Nom d'utilisateur n'existe pas.",'error')
             return redirect(url_for('login'))
         #Sachant que le username est le bon, on vérifie le mot de passe   
-        elif  user.username==username  and user.password==password:       #check_password_hash(user.password, password) :
+        elif  user.username==username  and check_password_hash(user.password,password):       #check_password_hash(user.password, password) :
             session['username'] = username
-            flash('Connexion réussie !', 'success')
+            #flash('Connexion réussie !', 'success')
             return redirect(url_for('profile'))
         else :
             flash('Mot de passe incorrect', 'error')
@@ -320,7 +321,20 @@ def user_profile(username):
         liked_post_ids=liked_post_ids,
         liked_comment_ids=liked_comment_ids
     )
-###################
+@app.route('/edit_biography', methods=['GET', 'POST'])
+def edit_biography():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    if request.method == 'POST':
+        user.biography = request.form.get('biography', '')
+        db.session.commit()
+        flash('Biographie mise à jour avec succès !', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('edit_biography.html', user=user)
+
 
 
 # ------------------ EXECUTION ------------------

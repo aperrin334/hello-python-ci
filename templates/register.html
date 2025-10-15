@@ -4,87 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-        .container {
-            background-color: #fff;
-            padding: 40px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        h1 {
-            margin-bottom: 30px;
-            color: #333;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        label {
-            margin-bottom: 5px;
-            font-weight: bold;
-            text-align: left;
-        }
-
-        input {
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        button {
-            padding: 12px;
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
-            background-color: #dc3545;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #1e7e34;
-        }
-
-        .alert {
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 6px;
-            text-align: left;
-        }
-
-        .alert-error {
-            background-color: #ffdddd;
-            color: #d8000c;
-            border: 1px solid #d8000c;
-        }
-
-        .alert-success {
-            background-color: #ddffdd;
-            color: #4f8a10;
-            border: 1px solid #4f8a10;
-        }
-    </style>
 </head>
 <body>
 <div class="container">
@@ -120,7 +41,7 @@
            
        
 
-        <button type="submit">S'inscrire</button>
+        <button class="btn" type="submit">S'inscrire</button>
     </form>
 </div>
 </body>

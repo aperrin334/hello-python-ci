@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supprimer mon compte</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+        }
+        h2 {
+            color: #d9534f;
+            margin-bottom: 1rem;
+        }
+        .warning {
+            color: #8a6d3b;
+            font-style: italic;
+            margin: 1rem 0;
+        }
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            margin: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+            background-color: #dc3545;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #b02a37;
+        }
+        .btn-secondary {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Supprimer mon compte</h2>
+        <p>
+            Vous allez supprimer définitivement votre compte, <strong>{{ user.username }}</strong> ({{ user.email }}).
+        </p>
+        <p class="warning">
+            <strong>Attention :</strong> Cette action est irréversible. Tous vos posts et données seront effacés.
+        </p>
+        <form method="POST" action="{{ url_for('delete_account') }}">
+            <a href="{{ url_for('profile') }}" class="btn btn-secondary">Annuler</a>
+            <button type="submit" class="btn">Supprimer définitivement</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -149,8 +149,18 @@
           {% endif %}
         {% endwith %}
 
-        <h2>👤 Profil de {{ user.name }}</h2>
-
+<div class="container mt-5">
+    <!-- Barre du haut avec bouton de déconnexion avec le bouton supprimer le compte -->
+<div class="mb-4">
+    <div class="d-flex justify-content-end mb-2">
+        <a href="{{ url_for('delete_account') }}" class="btn btn-danger btn-sm me-2">
+            Supprimer mon compte
+        </a>
+        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">
+            Se déconnecter
+        </a>
+    </div>
+    <h2>👤 Profil de {{ user.name }}</h2>
     <!-- Informations de base -->
     <div class="row mb-4">
         <div class="col-md-6">
@@ -190,8 +200,8 @@
        
 
 
-        <hr>
-    
+    <hr>
+
     <!-- Publications -->
     <h4>Vos publications</h4>
         {% for post in posts %}
@@ -223,7 +233,6 @@
                     <b>{{ comment.author.name }}:</b> {{ comment.content }}
                     <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
                 </small>
-
                 {% if current_user %}
                     {% set liked_comment = comment.id in liked_comment_ids %}
                     <form action="{{ url_for('like_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
@@ -234,7 +243,6 @@
                 {% endif %}
             </div>
             {% endfor %}
-
         </div>
         {% endfor %}
     </div>

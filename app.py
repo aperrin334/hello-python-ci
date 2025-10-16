@@ -147,12 +147,13 @@ def login():
         password = request.form['password']
         # Vérifier si l'utilisateur existe et que le mot de passe est correct
         user = User.query.filter_by(username=username).first()
+        
         #Vérifie le nom d'utilisateur n'existe pas 
         if not user:
             flash( "Nom d'utilisateur n'existe pas.",'error')
             return redirect(url_for('login'))
         #Sachant que le username est le bon, on vérifie le mot de passe   
-        elif  user.username==username  and check_password_hash(user.password,password):       #check_password_hash(user.password, password) :
+        elif  user.username==username  and user.password==password:       #check_password_hash(user.password, password) :
             session['username'] = username
             #flash('Connexion réussie !', 'success')
             return redirect(url_for('profile'))
@@ -334,6 +335,32 @@ def edit_biography():
         return redirect(url_for('profile'))
 
     return render_template('edit_biography.html', user=user)
+
+@app.route('/delete_account', methods=['GET', 'POST'])
+def delete_account():
+    user = User.query.filter_by(username=session['username']).first()
+    if request.method == 'POST':
+        # Supprimer tous les likes de l'utilisateur
+        Like.query.filter_by(user_id=user.id).delete()
+        CommentLike.query.filter_by(user_id=user.id).delete()
+
+        # Supprimer tous les commentaires de l'utilisateur
+        Comment.query.filter_by(user_id=user.id).delete()
+
+        # Supprimer tous les posts de l'utilisateur
+        Post.query.filter_by(user_id=user.id).delete()
+
+        # Supprimer l'utilisateur
+        db.session.delete(user)
+        db.session.commit()
+
+        # Déconnecter l'utilisateur
+        session.pop('username', None)
+        flash('Votre compte a été supprimé avec succès.', 'success')
+        return redirect(url_for('home'))
+
+    return render_template('delete_account.html', user=user)
+
 
 
 

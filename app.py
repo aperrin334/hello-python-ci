@@ -128,16 +128,20 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+
         # Vérifier si l'utilisateur existe déjà
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
             return "Username déjà existant"
+
         # Créer un nouvel utilisateur
         new_user = User(name=name, username=username, password=generate_password_hash(password), email=email)
         db.session.add(new_user)
         db.session.commit()
+
         flash('Inscription réussie !', 'success')
         return redirect(url_for('home'))
+
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -145,22 +149,27 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+
         # Vérifier si l'utilisateur existe et que le mot de passe est correct
         user = User.query.filter_by(username=username).first()
         
+
         #Vérifie le nom d'utilisateur n'existe pas 
         if not user:
             flash( "Nom d'utilisateur n'existe pas.",'error')
             return redirect(url_for('login'))
         #Sachant que le username est le bon, on vérifie le mot de passe   
-        elif  user.username==username  and user.password==password:       #check_password_hash(user.password, password) :
+        elif  user.username==username  and check_password_hash(user.password,password):       #check_password_hash(user.password, password) :
             session['username'] = username
             #flash('Connexion réussie !', 'success')
             return redirect(url_for('profile'))
         else :
             flash('Mot de passe incorrect', 'error')
             return redirect(url_for('login'))
+
+    
     return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():

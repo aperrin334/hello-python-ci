@@ -326,7 +326,7 @@ def search():
     results = []
     if query:
         # Recherche les utilisateurs dont le nom contient le mot-clé (insensible à la casse)
-        results = User.query.filter(User.username.ilike(f'%{query}%')).all()
+        results = User.query.filter(User.name.ilike(f'%{query}%')).all()
     return render_template('search_results.html', query=query, results=results)
 
 @app.route('/user/<username>')

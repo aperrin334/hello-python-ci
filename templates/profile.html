@@ -120,7 +120,9 @@
         {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
         👤 Profil
     </a>
-        <a href="{{ url_for('logout') }}">🚪 Déconnexion</a>
+         <a href="{{ url_for('logout') }}">🚪 Déconnexion</a>
+         <a href="{{ url_for('delete_account') }}" class="btn btn-danger btn-sm me-2">
+            Supprimer mon compte</a>
     </div>
 
     <!-- 💬 Contenu principal -->
@@ -153,12 +155,7 @@
     <!-- Barre du haut avec bouton de déconnexion avec le bouton supprimer le compte -->
 <div class="mb-4">
     <div class="d-flex justify-content-end mb-2">
-        <a href="{{ url_for('delete_account') }}" class="btn btn-danger btn-sm me-2">
-            Supprimer mon compte
-        </a>
-        <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">
-            Se déconnecter
-        </a>
+
     </div>
     <h2>👤 Profil de {{ user.name }}</h2>
     <!-- Informations de base -->

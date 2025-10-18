@@ -214,6 +214,13 @@
                             {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
                         </button>
                     </form>
+                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                        Supprimer 
+                        </button>
+                    </form>
+
+                    
                 {% endif %}
 
                 {% if current_user %}

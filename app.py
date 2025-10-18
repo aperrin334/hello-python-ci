@@ -159,7 +159,7 @@ def login():
             flash( "Nom d'utilisateur n'existe pas.",'error')
             return redirect(url_for('login'))
         #Sachant que le username est le bon, on vérifie le mot de passe   
-        elif  user.username==username  and check_password_hash(user.password,password):       #check_password_hash(user.password, password) :
+        elif  user.username==username  and check_password_hash(user.password,password):   
             session['username'] = username
             #flash('Connexion réussie !', 'success')
             return redirect(url_for('profile'))
@@ -235,6 +235,23 @@ def like_post(post_id):
     # Redirige vers la page précédente
     return redirect(request.referrer or url_for('profile'))
 
+
+@app.route('/delete_post/<int:post_id>', methods=['POST'])
+def delete_post(post_id):
+    post = Post.query.get(post_id)
+    # Supprimer les likes et commentaires liés au post (optionnel)
+    Like.query.filter_by(post_id=post_id).delete()
+    Comment.query.filter_by(post_id=post_id).delete()
+        # Supprimer les likes et commentaires liés au post (optionnel)
+    Like.query.filter_by(post_id=post_id).delete()
+    Comment.query.filter_by(post_id=post_id).delete()
+    # Supprimer le post
+    db.session.delete(post)
+    db.session.commit()
+    flash('Votre post a été supprimé avec succès.', 'success')
+    return redirect(url_for('profile'))
+
+
 @app.route('/comment/<int:post_id>', methods=['POST'])
 def create_comment(post_id):
     if 'username' not in session:
@@ -309,7 +326,7 @@ def search():
     results = []
     if query:
         # Recherche les utilisateurs dont le nom contient le mot-clé (insensible à la casse)
-        results = User.query.filter(User.name.ilike(f'%{query}%')).all()
+        results = User.query.filter(User.username.ilike(f'%{query}%')).all()
     return render_template('search_results.html', query=query, results=results)
 
 @app.route('/user/<username>')

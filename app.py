@@ -388,6 +388,20 @@ def delete_account():
     return render_template('delete_account.html', user=user)
 
 
+    ####### TIMELINE
+
+from flask import render_template
+
+@app.route('/feed')
+def feed():
+    user = User.query.filter_by(username=session['username']).first()
+    followed_users = user.followed.all()
+    # Tries les posts par date_posted (du plus récent au plus ancien)
+    posts = Post.query.filter(Post.user_id.in_([u.id for u in followed_users])) \
+                      .order_by(Post.date_posted.desc()) \
+                      .limit(20) \
+                      .all()
+    return render_template('timeline.html', posts=posts)
 
 
 # ------------------ EXECUTION ------------------

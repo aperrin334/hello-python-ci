@@ -115,7 +115,11 @@
         </form>
 
         <!-- Liens -->
-    <a href="{{ url_for('profile') }}" 
+          <!-- Timeline -->
+     <a href="{{ url_for('feed') }}" class="btn btn-primary">
+    Fil d'actualité
+    </a>
+          <a href="{{ url_for('profile') }}" 
         class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
         {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
         👤 Profil

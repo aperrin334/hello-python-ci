@@ -81,7 +81,9 @@
         <form class="search-box" method="GET" action="{{ url_for('search') }}">
             <input type="text" name="q" placeholder="🔍 Rechercher un profil..." aria-label="Rechercher">
         </form>
-
+              <!--Timeline -->       
+   <a href="{{ url_for('feed') }}" class="btn btn-primary">
+    Fil d'actualité
         <!-- Liens -->
     <a href="{{ url_for('profile') }}" 
         class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
@@ -146,6 +148,7 @@
                             {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
                         </button>
                     </form>
+                    
                 {% endif %}
             </div>
             {% endfor %}

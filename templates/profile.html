@@ -210,7 +210,7 @@
             <div class="card-body">
                 <!-- MODIFICATION : Ajout du nom de l'auteur du post avec un lien -->
                 <h5 class="card-title mb-2">
-                    <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
+                    <a href="{{ url_for('user_profile', username=post.user.username) }}" class="text-decoration-none text-dark">
                         {{ post.author.name }}
                     </a>
                 </h5>

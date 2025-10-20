@@ -74,6 +74,7 @@ class Post(db.Model):
     date_posted = db.Column(db.DateTime, default=lambda: datetime.now(PARIS))
     likes = db.relationship('Like', backref='post', lazy=True)
     comments = db.relationship('Comment', backref='post', lazy=True)
+    
 
 
 class Like(db.Model):

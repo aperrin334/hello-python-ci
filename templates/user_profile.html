@@ -82,7 +82,7 @@
             <input type="text" name="q" placeholder="🔍 Rechercher un profil..." aria-label="Rechercher">
         </form>
               <!--Timeline -->       
-   <a href="{{ url_for('feed') }}" class="btn btn-primary"
+   <a href="{{ url_for('feed') }}" 
         class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
         {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
     Fil d'actualité
@@ -117,7 +117,13 @@
     {% for post in posts %}
     <div class="card mb-3">
         <div class="card-body">
-            <p>{{ post.content }}</p>
+             <!-- MODIFICATION : Ajout du nom de l'auteur du post avec un lien -->
+             <h5 class="card-title mb-2">
+                <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
+                    {{ post.author.name }}
+                </a>
+            </h5>
+            <p class="card-text">{{ post.content }}</p>
             <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
 
             {% if current_user %}
@@ -139,7 +145,13 @@
             {% for comment in post.comments %}
             <div class="ms-3 mb-1">
                 <small>
-                    <b>{{ comment.author.name }}:</b> {{ comment.content }}
+                    <!-- MODIFICATION : Ajout d'un lien sur l'auteur du commentaire -->
+                    <b>
+                        <a href="{{ url_for('user_profile', username=comment.author.username) }}" class="text-decoration-none text-dark">
+                            {{ comment.author.name }}
+                        </a>:
+                    </b> 
+                    {{ comment.content }}
                     <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
                 </small>
 

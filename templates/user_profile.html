@@ -82,7 +82,9 @@
             <input type="text" name="q" placeholder="🔍 Rechercher un profil..." aria-label="Rechercher">
         </form>
               <!--Timeline -->       
-   <a href="{{ url_for('feed') }}" class="btn btn-primary">
+   <a href="{{ url_for('feed') }}" class="btn btn-primary"
+        class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
+        {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
     Fil d'actualité
         <!-- Liens -->
     <a href="{{ url_for('profile') }}" 

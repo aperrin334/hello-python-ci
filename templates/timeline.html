@@ -6,7 +6,7 @@
     <title>Ton fil d'actualité - InsaGram</title>
     <style>
         /* Style minimaliste pour la sidebar et les cartes */
-<style>
+    
     body {
         display: flex;
         min-height: 100vh;
@@ -75,7 +75,9 @@
         </form>
         <!-- Liens -->
           <!-- Timeline -->
-     <a href="{{ url_for('feed') }}" class="btn btn-primary">
+     <a href="{{ url_for('feed') }}" 
+        class="{% if request.endpoint == 'feed' %}active disabled{% endif %}" 
+        {% if request.endpoint == 'feed' %}tabindex="-1" aria-disabled="true"{% endif %}>
     Fil d'actualité
     </a>
     <a href="{{ url_for('profile') }}" 

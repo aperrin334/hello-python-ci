@@ -6,35 +6,40 @@
     <title>Connexion</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>    
-<div class="container">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          {% if category == 'error' %}
-            <div class="alert alert-error">
-              {{ message }}
-            </div>
-          {% elif category == 'success' %}
-            <div class="alert alert-success">
-              {{ message }}
-            </div>
-          {% endif %}
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
+<body>   
+    <div class="centered-page"> 
+  <div class="container">
 
-    <h1>Connexion</h1>
-    <form method="POST" action="/login">
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" id="username" name="username" required>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            {% if category == 'error' %}
+              <div class="alert alert-error">
+                {{ message }}
+              </div>
+            {% elif category == 'success' %}
+              <div class="alert alert-success">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
 
-        <label for="password">Mot de passe :</label>
-        <input type="password" id="password" name="password" required>
-
-        <button class="btn">Se connecter</button>
-    </form>
-</div>
+      <h1>Connexion</h1>
+      <form method="POST" action="/login">
+          <label for="username">Nom d'utilisateur :</label>
+          <input type="text" id="username" name="username" required>
+          <br>
+          <br>
+          <label for="password">Mot de passe :</label>
+          <input type="password" id="password" name="password" required>
+          <br>
+          <br>
+          <button class="btn">Se connecter</button>
+      </form>
+    </div>
+  </div>
 </body>
 </html>
 

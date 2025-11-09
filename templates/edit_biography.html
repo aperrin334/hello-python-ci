@@ -30,33 +30,57 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Biographie</h1>
-    <textarea id="zoneTexte" placeholder="Décrivez vous ici (max 300 caractères)..."></textarea>
-    <div id="compteur" class="compteur">0 / 300 caractères</div>
-    <div id="alerte" class="alert" style="display: none;"></div>
+  <div class="centered-page">
+    <div class="container">
+      <h1>Biographie</h1>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('edit_biography') }}">
+        <textarea id="zoneTexte" name="biography" placeholder="Décrivez vous ici (max 300 caractères)...">{{ user.biography or '' }}</textarea>
+        <div id="compteur" class="compteur">0 / 300 caractères</div>
+        <div id="alerte" class="alert" style="display: none;"></div>
+        <br>
+        <button id="validerBtn" class="btn">Valider</button>
+      </form>
+    </div>
   </div>
 
-  <script>
-    const textarea = document.getElementById('zoneTexte');
-    const compteur = document.getElementById('compteur');
-    const alerte = document.getElementById('alerte');
-    const maxCar = 300;
+<script>
+  const textarea = document.getElementById('zoneTexte');
+  const compteur = document.getElementById('compteur');
+  const alerte = document.getElementById('alerte');
+  const bouton = document.getElementById('validerBtn');
+  const maxCar = 300;
 
-    textarea.addEventListener('input', () => {
-      const longueur = textarea.value.length;
-      compteur.textContent = `${longueur} / ${maxCar} caractères`;
+  function updateCompteur() {
+    const longueur = textarea.value.length;
 
-      if (longueur >= maxCar) {
-        compteur.classList.add('limite');
-        alerte.style.display = 'block';
-        alerte.textContent = 'Vous avez atteint la limite maximale de 300 caractères.';
-        textarea.value = textarea.value.slice(0, maxCar);
-      } else {
-        compteur.classList.remove('limite');
-        alerte.style.display = 'none';
-      }
-    });
-  </script>
+    compteur.textContent = `${longueur} / ${maxCar} caractères`;
+
+    if (longueur > maxCar) {
+      compteur.classList.add('limite');
+      alerte.style.display = 'block';
+      alerte.textContent = `⚠️ Vous avez dépassé la limite de ${maxCar} caractères.`;
+      bouton.disabled = true;
+    } else {
+      compteur.classList.remove('limite');
+      alerte.style.display = 'none';
+      alerte.textContent = '';
+      bouton.disabled = false;
+    }
+  }
+
+  textarea.addEventListener('input', updateCompteur);
+
+  // Initialisation au chargement
+  updateCompteur();
+</script>
 </body>
 </html>

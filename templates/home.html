@@ -8,11 +8,13 @@
 </head>
 
 <body>
-    <div class="container">
-        <img src="{{ url_for('static', filename='images/LOGO.png') }}" alt="Logo InsaGram" class="logo">
-        <h1>Bienvenue sur InsaGram</h1>
-        <a href="/register" class="btn">S'inscrire</a>
-        <a href="/login" class="btn">Se connecter</a>
+    <div class="centered-page">
+        <div class="container">
+            <img src="{{ url_for('static', filename='images/LOGO.png') }}" alt="Logo InsaGram" class="logo">
+            <h1>Bienvenue sur InsaGram</h1>
+            <a href="/register" class="btn">S'inscrire</a>
+            <a href="/login" class="btn">Se connecter</a>
+        </div>
     </div>
 </body>
 </html>

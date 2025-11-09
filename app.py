@@ -120,10 +120,12 @@ def login():
     
     return render_template('login.html')
 
-@app.route('/logout')
+
+@app.route('/logout', methods=['GET', 'POST'])
 def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
+
 
 
 @app.route('/profile')
@@ -233,7 +235,7 @@ def like_comment(comment_id):
     return redirect(request.referrer or url_for('profile'))
 
 
-@app.route('/search', methods=['GET', 'POST'])
+@app.route('/search', methods=['GET'])
 def search():
     if 'username' not in session:
         return redirect(url_for('login'))
@@ -242,10 +244,16 @@ def search():
     results = []
 
     if query:
-        # Recherche les utilisateurs dont le nom contient le mot-clé (insensible à la casse)
-        results = User.query.filter(User.name.ilike(f'%{query}%')).all()
+        # Recherche sur le nom ou le username, insensible à la casse
+        results = User.query.filter(
+            ((User.name.ilike(f'%{query}%')) | (User.username.ilike(f'%{query}%'))) &
+            (User.username != session['username'])  # exclut l'utilisateur connecté
+        ).all()
 
     return render_template('search_results.html', query=query, results=results)
+
+
+
 @app.route('/user/<username>')
 def user_profile(username):
     user = User.query.filter_by(username=username).first_or_404()
@@ -268,19 +276,27 @@ def user_profile(username):
         liked_post_ids=liked_post_ids,
         liked_comment_ids=liked_comment_ids
     )
+    
 @app.route('/edit_biography', methods=['GET', 'POST'])
 def edit_biography():
     if 'username' not in session:
         return redirect(url_for('login'))
 
     user = User.query.filter_by(username=session['username']).first()
+
     if request.method == 'POST':
-        user.biography = request.form.get('biography', '')
+        biography_text = request.form.get('biography', '').strip()
+        if len(biography_text) > 300:
+            flash('La biographie dépasse 300 caractères.', 'error')
+            return render_template('edit_biography.html', user=user)
+        
+        user.biography = biography_text
         db.session.commit()
         flash('Biographie mise à jour avec succès !', 'success')
-        return redirect(url_for('profile'))
+        return redirect(url_for('profile'))  # redirige vers le profil
 
     return render_template('edit_biography.html', user=user)
+
 
 
 

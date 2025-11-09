@@ -34,8 +34,11 @@
     <!-- Barre du haut avec bouton de déconnexion -->
     <div class="flex-between">
         <h1>Profil de {{ user.username }}</h1>
-        <a href="{{ url_for('logout') }}" class="btn">Se déconnecter</a>
+        <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn">Se déconnecter</button>
+        </form>
     </div>
+
 
     <!-- Informations de base -->
     <div class="row">
@@ -47,18 +50,24 @@
     </div>
 
     <!-- Barre de recherche -->
-    <form method="GET" action="{{ url_for('search') }}" class="d-flex align-items-stretch" style="max-width: 400px;">
-        <input class="form-control me-2" type="search" name="q" placeholder="Rechercher un profil..." aria-label="Search">
+    <div class="conteneur-recherche">
+    <form class="form-recherche" action="{{ url_for('search') }}" method="get">
+        <input
+            class="champ-recherche"
+            type="search"
+            name="q"
+            placeholder="Rechercher un profil...">
         <button class="btn" type="submit">Rechercher</button>
     </form>
+    </div>
 
-
+    <hr>
 
     <!-- Section Biographie -->
     <div class="biography-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">📜 Ma biographie</h4>
-            <a href="{{ url_for('edit_biography') }}" class="btn btn-sm btn-outline-primary">Modifier</a>
+        <div class="flex-between">
+            <h1> Ma biographie</h1>
+            <a href="{{ url_for('edit_biography') }}" class="btn">Modifier</a>
         </div>
         {% if user.biography %}
             <p class="biography-text">{{ user.biography }}</p>
@@ -70,63 +79,120 @@
     <hr>
 
     <!-- Création de publication -->
-    <h4>📝 Créer une publication</h4>
-    <form method="POST" action="{{ url_for('create_post') }}">
-        <div class="mb-3">
-            <textarea class="form-control" name="content" rows="3" placeholder="Écrivez quelque chose..."></textarea>
+    <h1>Créer une publication</h1>
+    <form method="POST" action="{{ url_for('create_post') }}" style="width: 100%;">
+        <div class="mb-3" style="width: 100%;">
+            <textarea 
+                class="form-control" 
+                name="content" 
+                rows="3" 
+                placeholder="Écrivez quelque chose..." 
+                style="width: 100%; box-sizing: border-box;"></textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Publier</button>
+        <br>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Publier</button>
     </form>
+
 
     <hr>
 
     <!-- Publications -->
-    <h4>Vos publications</h4>
-    {% for post in posts %}
-    <div class="card mb-3">
-        <div class="card-body">
-            <!-- Contenu du post -->
-            <p>{{ post.content }}</p>
-            <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
+    <h1>Mes publications</h1>
+    <div class="container--lg posts-container" style="display: flex; flex-direction: column; gap: 20px;">
 
-            <!-- Bouton Like du post -->
-            {% if current_user %}
-                {% set liked = post.id in liked_post_ids %}
-                <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                        {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
-                    </button>
-                </form>
-            {% endif %}
+        {% for post in posts %}
+        <div style="display: flex; gap: 15px; align-items: flex-start;">
 
-            <!-- Formulaire pour ajouter un commentaire -->
-            {% if current_user %}
-            <form action="{{ url_for('create_comment', post_id=post.id) }}" method="POST" class="mb-2 mt-2 d-flex">
-                <input type="text" name="content" class="form-control form-control-sm me-2" placeholder="Écrire un commentaire...">
-                <button type="submit" class="btn btn-sm btn-primary">Envoyer</button>
-            </form>
-            {% endif %}
+            <!-- Partie gauche : cadre blanc avec texte et commentaires -->
+            <div style="flex: 1; background-color: #ffffff; padding: 15px; border-radius: var(--radius-md); box-shadow: 2px 2px 8px rgba(0,0,0,0.1);">
 
-            <!-- Liste des commentaires -->
-            {% for comment in post.comments %}
-            <div class="ms-3 mb-1">
-                <small>
-                    <b>{{ comment.author.name }}:</b> {{ comment.content }}
-                    <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
-                </small>
+                <!-- Contenu du post -->
+                <div style="font-size: 1.2rem; margin-bottom: 10px;">
+                    <p>{{ post.content }}</p>
+                    <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
+                </div>
+
+                <!-- Partie droite : bouton Like du post -->
                 {% if current_user %}
-                    {% set liked_comment = comment.id in liked_comment_ids %}
-                    <form action="{{ url_for('like_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-sm {% if liked_comment %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                            {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
+                <div style="display: flex; flex-direction: column; justify-content: flex-start;">
+                    {% set liked = post.id in liked_post_ids %}
+                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST">
+                        <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
                         </button>
                     </form>
+                </div>
                 {% endif %}
+            </div>
+        </div>
+
+        <!-- Formulaire pour ajouter un commentaire -->
+        {% if current_user %}
+        <form action="{{ url_for('create_comment', post_id=post.id) }}" method="POST" style="display: flex; width: 100%; gap: 10px; margin-bottom: 10px;">
+            <input type="text" name="content" class="form-control form-control-sm" placeholder="Écrire un commentaire..." style="flex: 1; min-width: 0;">
+            <button type="submit" class="btn btn-sm btn-primary">Envoyer</button>
+        </form>
+        {% endif %}
+
+        <!-- Liste des commentaires dans un cadre gris -->
+        <div style="background-color: var(--background-2); padding: 10px; border-radius: var(--radius-sm);">
+            {% for comment in post.comments %}
+            <div style="margin-bottom: 5px;">
+                <small>
+                    <b>{{ comment.author.username }}:</b> {{ comment.content }}
+                    <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
+                </small>
             </div>
             {% endfor %}
         </div>
+        {% endfor %}
+
     </div>
-    {% endfor %}
+
+
+
+
+
+
+
+
 </div>
+
+<script>
+let loading = false;
+let lastPostId = {{ posts[-1].id if posts else 0 }};
+
+function loadMorePosts() {
+    if (loading) return;
+    loading = true;
+    const loader = document.getElementById('loader');
+    loader.style.display = 'block';
+
+    fetch(`/load_posts?last_id=${lastPostId}`)
+    .then(response => response.text())
+    .then(html => {
+        const container = document.getElementById('posts-container');
+        if (html.trim() !== "") {
+            container.insertAdjacentHTML('beforeend', html);
+            lastPostId = container.lastElementChild.dataset.postId;
+        }
+        loader.style.display = 'none';
+        loading = false;
+    })
+    .catch(err => {
+        console.error(err);
+        loader.style.display = 'none';
+        loading = false;
+    });
+}
+
+// Détecte quand l'utilisateur approche du bas de la page
+window.addEventListener('scroll', () => {
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 100) {
+        loadMorePosts();
+    }
+});
+</script>
+
 </body>
 </html>

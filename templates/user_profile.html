@@ -146,9 +146,15 @@
     <h3>🗒️ Publications</h3>
 
     {% for post in posts %}
-    <div class="post-container">
-        <div class="post-header">
-            <span><b>{{ user.username }}</b></span>
+    <div class="card mb-3">
+        <div class="card-body">
+             <!-- MODIFICATION : Ajout du nom de l'auteur du post avec un lien -->
+             <h5 class="card-title mb-2">
+                <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
+                    {{ post.author.name }}
+                </a>
+            </h5>
+            <p class="card-text">{{ post.content }}</p>
             <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
         </div>
 
@@ -184,6 +190,7 @@
                             {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
                         </button>
                     </form>
+                    
                 {% endif %}
             </div>
             {% endfor %}
@@ -198,5 +205,6 @@
     </div>
     {% endfor %}
 </div>
+
 </body>
 </html>

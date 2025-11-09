@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ton fil d'actualité - InsaGram</title>
+    <style>
+        /* Style minimaliste pour la sidebar et les cartes */
+    
+    body {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f8f9fa;
+    }
+    /* Sidebar */
+    .sidebar {
+        width: 250px;
+        background-color: #343a40;
+        color: white;
+        padding: 20px;
+        position: fixed;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+    .sidebar h3 {
+        text-align: center;
+        color: #fff;
+        margin-bottom: 30px;
+    }
+    .sidebar a {
+        display: block;
+        color: #ccc;
+        text-decoration: none;
+        padding: 10px 15px;
+        border-radius: 8px;
+        margin-bottom: 10px;
+    }
+    .sidebar a:hover,
+    .sidebar a.active {
+        background-color: #495057;
+        color: white;
+    }
+    /* Barre de recherche */
+    .search-box input {
+        width: 100%;
+        padding: 8px;
+        border: none;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    img.logo {
+        width: 120px;
+        margin-bottom: 10px;
+    }
+
+    /* Contenu principal */
+    .main-content {
+        margin-left: 270px;  /* Décale le contenu pour éviter la sidebar (250px + 20px de marge) */
+        padding: 30px;
+        width: calc(100% - 270px);  /* Ajuste la largeur du contenu */
+    }
+</style>
+
+    </style>
+</head>
+<body>
+    <!-- 🧭 Sidebar -->
+    <div class="sidebar">
+        <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+        <!-- Barre de recherche -->
+        <form class="search-box" method="GET" action="{{ url_for('search') }}">
+            <input type="text" name="q" placeholder="🔍 Rechercher un profil..." aria-label="Rechercher">
+        </form>
+        <!-- Liens -->
+          <!-- Timeline -->
+     <a href="{{ url_for('feed') }}" 
+        class="{% if request.endpoint == 'feed' %}active disabled{% endif %}" 
+        {% if request.endpoint == 'feed' %}tabindex="-1" aria-disabled="true"{% endif %}>
+    Fil d'actualité
+    </a>
+    <a href="{{ url_for('profile') }}" 
+        class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
+        {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
+        👤 Profil
+    </a>
+        <a href="{{ url_for('logout') }}">🚪 Déconnexion</a>
+    </div>
+<!-- Contenu principal -->
+<div class="main-content">
+    <h2>Ton fil d'actualité</h2>
+    {% if posts %}
+        {% for post in posts %}
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                     <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
+                        {{ post.author.username }}
+                    </a>
+                    </h5>
+                    <p class="card-text">{{ post.content }}</p>
+                    <p class="card-text text-muted">
+                        Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}
+                    </p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Aucun post à afficher. Suivez des utilisateurs pour voir leurs posts !</p>
+    {% endif %}
+</div>
+</html>
+

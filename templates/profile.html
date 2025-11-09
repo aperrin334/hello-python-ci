@@ -18,17 +18,58 @@
         {% endif %}
       {% endfor %}
     </div>
-    <script>
-      setTimeout(function() {
-        const container = document.getElementById('flash-container');
-        if (container) {
-          container.style.opacity = '0';
-          setTimeout(() => container.remove(), 500);
-        }
-      }, 3000);
-    </script>
-  {% endif %}
-{% endwith %}
+
+    <body>
+
+    <!-- 🧭 Sidebar -->
+    <div class="sidebar">
+        <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+
+        <!-- Barre de recherche -->
+        <form class="search-box" method="GET" action="{{ url_for('search') }}">
+            <input type="text" name="q" placeholder="🔍 Rechercher un profil..." aria-label="Rechercher">
+        </form>
+
+        <!-- Liens -->
+          <!-- Timeline -->
+     <a href="{{ url_for('feed') }}" class="btn btn-primary">
+    Fil d'actualité
+    </a>
+          <a href="{{ url_for('profile') }}" 
+        class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
+        {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
+        👤 Profil
+    </a>
+         <a href="{{ url_for('logout') }}">🚪 Déconnexion</a>
+         <a href="{{ url_for('delete_account') }}" class="btn btn-danger btn-sm me-2">
+             Supprimer mon compte</a>
+    </div>
+
+    <!-- 💬 Contenu principal -->
+    <div class="main-content bg-light">
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div id="flash-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+              {% for category, message in messages %}
+                {% if category == 'success' %}
+                  <div class="alert alert-success" role="alert" style="transition: opacity 0.5s;">
+                    {{ message }}
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+            <script>
+              setTimeout(function() {
+                const container = document.getElementById('flash-container');
+                if (container) {
+                  container.style.opacity = '0';
+                  setTimeout(() => container.remove(), 500);
+                }
+              }, 3000);
+            </script>
+          {% endif %}
+        {% endwith %}
 
 <div class="container container--lg">
     <!-- Barre du haut avec bouton de déconnexion -->
@@ -46,6 +87,10 @@
             <p><b>Nom :</b> {{ user.name }}</p>
             <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
             <p><b>Email :</b> {{ user.email }}</p>
+        <p>
+            <b>Followers :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
+            <b>Suivi(e)s :</b> <span class="badge bg-primary">{{ user.following_count }}</span>
+        </p>
         </div>
     </div>
 
@@ -92,27 +137,60 @@
         <br>
         <button type="submit" class="btn btn-primary" style="width: 100%;">Publier</button>
     </form>
+        
+
 
 
     <hr>
 
     <!-- Publications -->
-    <h1>Mes publications</h1>
-    <div class="container--lg posts-container" style="display: flex; flex-direction: column; gap: 20px;">
-
+    <h4>Vos publications</h4>
         {% for post in posts %}
-        <div style="display: flex; gap: 15px; align-items: flex-start;">
+        <div class="card mb-3">
+            <div class="card-body">
+                <!-- MODIFICATION : Ajout du nom de l'auteur du post avec un lien -->
+                <h5 class="card-title mb-2">
+                    <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
+                        {{ post.author.name }}
+                    </a>
+                </h5>
+                <p class="card-text">{{ post.content }}</p>
+                <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
 
-            <!-- Partie gauche : cadre blanc avec texte et commentaires -->
-            <div style="flex: 1; background-color: #ffffff; padding: 15px; border-radius: var(--radius-md); box-shadow: 2px 2px 8px rgba(0,0,0,0.1);">
+                {% if current_user %}
+                    {% set liked = post.id in liked_post_ids %}
+                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
+                        </button>
+                    </form>
+                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">
+                        Supprimer 
+                        </button>
+                    </form>
+                {% endif %}
 
-                <!-- Contenu du post -->
-                <div style="font-size: 1.2rem; margin-bottom: 10px;">
-                    <p>{{ post.content }}</p>
-                    <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
-                </div>
+                {% if current_user %}
+                <form action="{{ url_for('create_comment', post_id=post.id) }}" method="POST" class="mb-2 mt-2 d-flex">
+                    <input type="text" name="content" class="form-control form-control-sm me-2" placeholder="Écrire un commentaire...">
+                    <button type="submit" class="btn btn-sm btn-primary">Envoyer</button>
+                </form>
+                {% endif %}
 
-                <!-- Partie droite : bouton Like du post -->
+            <!-- Liste des commentaires -->
+            {% for comment in post.comments %}
+            <div class="ms-3 mb-1">
+                <small>
+                    <!-- MODIFICATION : Ajout d'un lien sur l'auteur du commentaire -->
+                    <b>
+                        <a href="{{ url_for('user_profile', username=comment.author.username) }}" class="text-decoration-none text-dark">
+                            {{ comment.author.name }}
+                        </a>:
+                    </b>
+                    {{ comment.content }}
+                    <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
+                </small>
                 {% if current_user %}
                 <div style="display: flex; flex-direction: column; justify-content: flex-start;">
                     {% set liked = post.id in liked_post_ids %}

@@ -3,112 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ton fil d'actualité - InsaGram</title>
-    <style>
-        /* Style minimaliste pour la sidebar et les cartes */
-    
-    body {
-        display: flex;
-        min-height: 100vh;
-        background-color: #f8f9fa;
-    }
-    /* Sidebar */
-    .sidebar {
-        width: 250px;
-        background-color: #343a40;
-        color: white;
-        padding: 20px;
-        position: fixed;
-        height: 100%;
-        top: 0;
-        left: 0;
-    }
-    .sidebar h3 {
-        text-align: center;
-        color: #fff;
-        margin-bottom: 30px;
-    }
-    .sidebar a {
-        display: block;
-        color: #ccc;
-        text-decoration: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        margin-bottom: 10px;
-    }
-    .sidebar a:hover,
-    .sidebar a.active {
-        background-color: #495057;
-        color: white;
-    }
-    /* Barre de recherche */
-    .search-box input {
-        width: 100%;
-        padding: 8px;
-        border: none;
-        border-radius: 6px;
-        margin-bottom: 20px;
-    }
-
-    img.logo {
-        width: 120px;
-        margin-bottom: 10px;
-    }
-
-    /* Contenu principal */
-    .main-content {
-        margin-left: 270px;  /* Décale le contenu pour éviter la sidebar (250px + 20px de marge) */
-        padding: 30px;
-        width: calc(100% - 270px);  /* Ajuste la largeur du contenu */
-    }
-</style>
-
-    </style>
+    <title>Fil d’actualité - InsaGram</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <!-- 🧭 Sidebar -->
-    <div class="sidebar">
-        <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
-        <!-- Barre de recherche -->
-        <form class="search-box" method="GET" action="{{ url_for('search') }}">
-            <input type="text" name="q" placeholder="🔍 Rechercher un profil..." aria-label="Rechercher">
-        </form>
-        <!-- Liens -->
-          <!-- Timeline -->
-     <a href="{{ url_for('feed') }}" 
-        class="{% if request.endpoint == 'feed' %}active disabled{% endif %}" 
-        {% if request.endpoint == 'feed' %}tabindex="-1" aria-disabled="true"{% endif %}>
-    Fil d'actualité
-    </a>
-    <a href="{{ url_for('profile') }}" 
-        class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
-        {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
-        👤 Profil
-    </a>
-        <a href="{{ url_for('logout') }}">🚪 Déconnexion</a>
-    </div>
-<!-- Contenu principal -->
-<div class="main-content">
-    <h2>Ton fil d'actualité</h2>
-    {% if posts %}
-        {% for post in posts %}
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">
-                     <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
-                        {{ post.author.username }}
-                    </a>
-                    </h5>
-                    <p class="card-text">{{ post.content }}</p>
-                    <p class="card-text text-muted">
-                        Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}
-                    </p>
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <p>Aucun post à afficher. Suivez des utilisateurs pour voir leurs posts !</p>
-    {% endif %}
-</div>
-</html>
 
+<!-- 🧭 Sidebar -->
+<div class="sidebar">
+    <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+
+    <div class="container-search">
+        <form method="GET" action="{{ url_for('search') }}" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Rechercher un profil..."
+                aria-label="Rechercher"
+                class="search-input-with-icon">
+        </form>
+    </div>
+
+    <nav class="sidebar-nav">
+        <form action="{{ url_for('feed') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'feed' %}active{% endif %}">
+                Fil d’actualité
+            </button>
+        </form>
+
+        <form action="{{ url_for('profile') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'profile' %}active{% endif %}">
+                Profil
+            </button>
+        </form>
+
+        <!-- Bouton supprimer le compte -->
+        <form action="{{ url_for('delete_account') }}" method="post">
+            <button type="submit" class="sidebar-btn btn-danger">
+                Supprimer mon compte
+            </button>
+        </form>
+    </nav>
+</div>
+
+<!-- 💬 CONTENU PRINCIPAL -->
+<div class="main-content bg-light">
+    <div class="container container--lg">
+
+        <h1 class="h1">Fil d’actualité</h1>
+
+        {% if posts %}
+
+            {% for post in posts %}
+                <div class="container--lg posts-container" id="posts-container" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="post-card" data-post-id="{{ post.id }}" style="display: flex; gap: 15px; align-items: flex-start;">
+
+                        <!-- Partie gauche : cadre blanc avec texte et commentaires -->
+                        <div style="flex: 1; background-color: #ffffff; padding: 15px; border-radius: var(--radius-md); box-shadow: 2px 2px 8px rgba(0,0,0,0.1);">
+
+                            <!-- Contenu du post -->
+                            <div style="font-size: 1.2rem; margin-bottom: 10px;">
+                                <h5 class="card-title mb-2">
+                                    <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
+                                        {{ post.author.username }}
+                                    </a>
+                                </h5>
+                                <p>{{ post.content }}</p>
+                                <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
+                            </div>
+
+                            <!-- Bouton Like -->
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    {% set liked = post.id in liked_post_ids %}
+                                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
+                                        </button>
+                                    </form>
+                                </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulaire commentaire -->
+                    <form action="{{ url_for('create_comment', post_id=post.id) }}" method="POST" style="display: flex; width: 100%; gap: 10px; margin-top: 10px;">
+                        <input type="text" name="content" class="form-control form-control-sm" placeholder="Écrire un commentaire..." style="flex: 1; min-width: 0;">
+                        <button type="submit" class="btn btn-sm btn-primary">Envoyer</button>
+                    </form>
+
+
+                    <!-- Commentaires dans cadre gris -->
+                    <div style="background-color: var(--background-2); padding: 10px; border-radius: var(--radius-sm); margin-top: 10px;">
+                        {% for comment in post.comments %}
+                        <div style="margin-bottom: 5px; display: flex; align-items: center; gap: 5px;">
+                            <small>
+                                <b><a href="{{ url_for('user_profile', username=comment.author.username) }}" class="text-decoration-none text-dark">{{ comment.author.username }}</a>:</b> {{ comment.content }}
+                                <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
+                            </small>
+                                {% set liked_comment = comment.id in liked_comment_ids %}
+                                <form action="{{ url_for('like_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm {% if liked_comment %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                        {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
+                                    </button>
+                                </form>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+        <p>Aucun post à afficher. Suivez des utilisateurs pour voir leurs publications !</p>
+        {% endif %}
+
+    </div>
+</div>
+
+</body>
+</html>

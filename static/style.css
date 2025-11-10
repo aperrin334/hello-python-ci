@@ -37,6 +37,87 @@ body {
     height: 100vh;
 }
 
+.sidebar {
+    position: fixed;       /* Reste fixe sur la page */
+    top: 0;                /* Aligné en haut */
+    left: 0;               /* Aligné à gauche */
+    height: 100vh;         /* Prend toute la hauteur */
+    width: 250px;          /* Largeur fixe */
+    background-color: var(--background-2);
+    padding: 20px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 100;          /* Au-dessus du contenu */
+}
+
+/* === BOUTONS DE LA SIDEBAR === */
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.sidebar-btn {
+    width: 100%;
+    background-color: #f6f6f6;
+    border: none;
+    color: #333;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.sidebar-btn:hover {
+    background-color: #e9ecef;
+    transform: translateX(4px);
+}
+
+.sidebar-btn.active {
+    background-color: var(--bleu-2);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+    transform: none;
+}
+
+.sidebar-btn.btn-danger {
+    width: 100%;
+    background-color: #f6f6f6;
+    border: none;
+    color: #000000;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.sidebar-btn.btn-danger:hover {
+    background-color: #c0392b;
+}
+
+
+/* Pour les formulaires dans la nav */
+.sidebar-nav form {
+    width: 100%;
+}
+
+
+.main-content {
+    margin-left: 270px;    /* Laisse la place pour la sidebar */
+    padding: 20px;
+}
+
+
 /* Boites */
 
 /* Base commune */
@@ -55,23 +136,57 @@ body {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* === CONTENEUR GLOBAL === */
 .container-search {
-  background:  linear-gradient(145deg, var(--background-2), var(--background));
-  border-radius: var(--radius-md);
-  box-shadow:
-    8px 8px 20px rgba(0, 0, 0, 0.3),
-    -8px -8px 20px rgba(255, 255, 255, 0.1),
-    inset 2px 2px 8px rgba(255, 255, 255, 0.2),
-    inset -2px -2px 8px rgba(0, 0, 0, 0.3);
-  text-align: center;
-  max-width: 400px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  width: 100%; /* Prend toute la largeur disponible */
-  padding: 0; /* Supprime les paddings par défaut */
-  margin: 0; /* Supprime les marges par défaut */
-  margin-bottom: 20px; /* Espace entre la barre de recherche et la biographie */
-  padding-bottom: 20px; /* Espace intérieur en bas */
-  border-bottom: 1px solid #e0e0e0; /* Ligne de séparation discrète */
+    width: 100%;
+    display: flex;
+    justify-content: center;   /* ✅ centre horizontalement */
+    align-items: center;        /* centre verticalement (si tu veux l’espacer dans la sidebar) */
+    margin: 20px 0;
+}
+
+/* === FORMULAIRE DE RECHERCHE === */
+.search-form {
+    position: relative;
+    width: 80%;                /* largeur du champ dans la sidebar */
+    max-width: 220px;          /* empêche de trop s’étaler */
+    display: flex;
+    justify-content: center;   /* ✅ centre le champ à l’intérieur */
+}
+
+/* === ICÔNE === */
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%);
+    font-size: 1rem;
+    color: #888;
+}
+
+/* === CHAMP DE RECHERCHE === */
+.search-input-with-icon {
+    width: 100%;
+    padding: 10px 15px 10px 35px;  /* espace pour l’icône */
+    background-color: #f0f2f5;
+    border: none;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    color: #333;
+    text-align: left;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+/* === FOCUS === */
+.search-input-with-icon:focus {
+    background-color: #fff;
+    box-shadow: 0 0 0 2px #007bff44;
+}
+
+/* === PLACEHOLDER === */
+.search-input-with-icon::placeholder {
+    color: #999;
 }
 
 

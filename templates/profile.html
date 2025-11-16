@@ -142,7 +142,7 @@
                                         {{ post.author.username }}
                                     </a>
                                 </h5>
-                                <p>{{ post.content }}</p>
+                                <p class="post-content">{{ post.content }}</p>
                                 <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
                             </div>
 
@@ -172,7 +172,7 @@
                     <div style="background-color: var(--background-2); padding: 10px; border-radius: var(--radius-sm); margin-top: 10px;">
                         {% for comment in post.comments %}
                         <div style="margin-bottom: 5px; display: flex; align-items: center; gap: 5px;">
-                            <small>
+                            <small class="comment-text">
                                 <b><a href="{{ url_for('user_profile', username=comment.author.username) }}" class="text-decoration-none text-dark">{{ comment.author.username }}</a>:</b> {{ comment.content }}
                                 <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
                             </small>

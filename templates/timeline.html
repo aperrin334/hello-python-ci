@@ -109,6 +109,13 @@
     {% else %}
         <p>Aucun post à afficher. Suivez des utilisateurs pour voir leurs posts !</p>
     {% endif %}
+{% if posts %}
+    <a href="{{ url_for('feed', offset=offset + 20) }}" 
+       class="btn btn-secondary" 
+       style="display: block; margin-top: 20px;">
+        Voir 20 Tweets supplémentaires
+    </a>
+{% endif %}
 </div>
 </html>
 

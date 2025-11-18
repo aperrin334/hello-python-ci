@@ -319,6 +319,13 @@ img.logo {
     color: var(--text);
 }
 
+.post-content,
+.comment-text {
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
 .text-muted {
   color: #6c757d !important;
 }

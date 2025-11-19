@@ -376,6 +376,7 @@ def edit_biography():
 @app.route('/delete_account', methods=['GET', 'POST'])
 def delete_account():
     user = User.query.filter_by(username=session['username']).first()
+    
     if request.method == 'POST':
         # Supprimer tous les likes de l'utilisateur
         Like.query.filter_by(user_id=user.id).delete()

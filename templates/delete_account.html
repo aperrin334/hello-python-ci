@@ -11,16 +11,33 @@
     <div class="container container--md">
         <h2>Supprimer mon compte</h2>
         <p>
-            Vous allez supprimer définitivement votre compte, <strong>{{ user.username }}</strong> ({{ user.email }}).
+            Vous allez supprimer définitivement votre compte, 
+            <strong>{{ user.username }}</strong> ({{ user.email }}).
         </p>
+
         <p class="warning">
-            <strong>Attention :</strong> Cette action est irréversible. Tous vos posts et données seront effacés.
+            <strong>Attention :</strong> Cette action est irréversible. 
+            Tous vos posts et données seront effacés.
         </p>
-        <form method="POST" action="{{ url_for('delete_account') }}" >
-            <a href="{{ url_for('profile') }}" class="btn btn-secondary">Annuler</a>
-            <button type="submit" class="btn">Supprimer définitivement</button>
+
+        <form method="POST" action="{{ url_for('delete_account') }}"
+              style="display: flex; justify-content: center; gap: 20px; margin-top: 25px;">
+            
+            <!-- Bouton Annuler -->
+            <a href="{{ url_for('profile') }}" class="btn" 
+               style="background-color: #6c757d; color: white;">
+                Annuler
+            </a>
+
+            <!-- Bouton Supprimer -->
+            <button type="submit" class="btn"
+                    style="background-color: #c0392b; color: white;">
+                Supprimer définitivement
+            </button>
         </form>
     </div>
 </body>
+
+
 
 </html>

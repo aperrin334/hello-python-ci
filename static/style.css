@@ -62,6 +62,7 @@ body {
 }
 
 .sidebar-btn {
+    display: block;
     width: 100%;
     background-color: #f6f6f6;
     border: none;
@@ -90,15 +91,7 @@ body {
 .sidebar-btn.btn-danger {
     width: 100%;
     background-color: #f6f6f6;
-    border: none;
     color: #000000;
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 10px 15px;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.3s ease;
 }
 
 .sidebar-btn.btn-danger:hover {

@@ -11,7 +11,10 @@
     <div class="centered-page">
         <div class="container">
             <img src="{{ url_for('static', filename='images/LOGO.png') }}" alt="Logo InsaGram" class="logo">
-            <h1>Bienvenue sur InsaGram</h1>
+            <!-- Titre -->
+            <h1 style="margin-bottom: 40px; font-size: 2.2rem;">
+                Bienvenue sur <span style="color: var(--bleu-2);">InsaGram</span>
+            </h1>
             <a href="/register" class="btn">S'inscrire</a>
             <a href="/login" class="btn">Se connecter</a>
         </div>

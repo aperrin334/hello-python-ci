@@ -370,6 +370,12 @@ def user_profile(username):
         current_user = User.query.filter_by(username=session['username']).first()
         liked_post_ids = [like.post_id for like in Like.query.filter_by(user_id=current_user.id).all()]
         liked_comment_ids = [like.comment_id for like in CommentLike.query.filter_by(user_id=current_user.id).all()]
+        # 🐞 DEBUG : Afficher IDs
+    print("CURRENT USER ID:", current_user.id if current_user else None)
+    for post in posts:
+        print(f"POST ID: {post.id}, AUTHOR ID: {post.user_id}")
+        for comment in post.comments:
+            print(f"COMMENT ID: {comment.id}, AUTHOR ID: {comment.user_id}")
     return render_template(
         'user_profile.html',
         user=user,

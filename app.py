@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 from werkzeug.security import check_password_hash,generate_password_hash # Pour vérifier le hash du mot de passe
@@ -373,6 +373,59 @@ def edit_biography():
 
     return render_template('edit_biography.html', user=user)
 
+
+
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+
+    if request.method == 'POST':
+
+        # Récupérer les données du formulaire
+        new_name = request.form.get('Nom', '').strip()
+        new_email = request.form.get('Email', '').strip()
+        new_username = request.form.get("Nom d'utilisateur", '').strip()
+
+        # pb : après strip les données se vident
+
+        # Validation basique
+        if not new_name or not new_email or not new_username:
+            flash('Tous les champs sont obligatoires.', 'error')
+            return redirect(url_for('edit_profile'))
+        
+        # Vérifier si le nouveau username existe déjà (sauf si c'est le même)
+        if new_username != user.username:
+            existing_user = User.query.filter_by(username=new_username).first()
+            if existing_user:
+                flash("Ce nom d'utilisateur est déjà pris.", 'error')
+                return redirect(url_for('edit_profile'))
+        
+        # Vérifier si le nouvel email existe déjà (sauf si c'est le même)
+        if new_email != user.email:
+            existing_email = User.query.filter_by(email=new_email).first()
+            if existing_email:
+                flash('Cette adresse email est déjà utilisée.', 'error')
+                return redirect(url_for('edit_profile'))
+
+        # Mettre à jour le nom et l'email
+        user.name = new_name
+        user.email = new_email
+
+        # Si le username change, mettre à jour la session
+        if new_username != user.username:
+            user.username = new_username
+            session['username'] = new_username
+        
+        db.session.commit()
+        flash('Profil mis à jour avec succès !', 'success')
+        return redirect(url_for('profile'))
+    
+    return render_template('edit_profile.html', user=user)
+
+
 @app.route('/delete_account', methods=['GET', 'POST'])
 def delete_account():
     user = User.query.filter_by(username=session['username']).first()
@@ -402,7 +455,7 @@ def delete_account():
 
     ####### TIMELINE
 
-from flask import render_template
+
 
 @app.route('/feed')
 def feed():

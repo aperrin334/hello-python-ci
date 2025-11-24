@@ -248,6 +248,7 @@
                             {{ comment.author.name }}
                         </a>:
                     </b>
+
                     {{ comment.content }}
                     <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
                 </small>
@@ -258,7 +259,13 @@
                             {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
                         </button>
                     </form>
+                {% if current_user and (comment.author.id == current_user.id or post.author.id == current_user.id) %}
+                    <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-sm btn-danger">🗑️
+                        </button>
+                    </form>
                 {% endif %}
+             {% endif %}
             </div>
             {% endfor %}
         </div>

@@ -94,6 +94,7 @@
                 <p><b>Nom :</b> {{ user.name }}</p>
                 <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
                 <p><b>Email :</b> {{ user.email }}</p>
+                <a href="{{ url_for('edit_profile') }}" class="btn btn-edit">Modifier mon profil</a>
                 <p>
                     <b>Followers :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
                     <b>Suivi(e)s :</b> <span class="badge bg-primary">{{ user.following_count }}</span>

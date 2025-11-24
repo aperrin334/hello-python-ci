@@ -288,15 +288,15 @@ def delete_comment(comment_id):
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    current_user = User.query.filter_by(username=session['username']).first()
+    user = User.query.filter_by(username=session['username']).first()
     comment = Comment.query.get_or_404(comment_id)
 
     # L'auteur du commentaire
-    is_comment_author = (comment.user_id == current_user.id)
+    is_comment_author = (comment.user_id == user.id)
 
     # L'auteur du post
     post = Post.query.get(comment.post_id)
-    is_post_owner = (post.user_id == current_user.id)
+    is_post_owner = (post.user_id == user.id)
 
     if not (is_comment_author or is_post_owner):
         flash("Vous ne pouvez supprimer que vos propres commentaires ou ceux sous vos publications.", "error")

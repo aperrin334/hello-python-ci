@@ -385,9 +385,9 @@ def edit_profile():
     if request.method == 'POST':
 
         # Récupérer les données du formulaire
-        new_name = request.form.get('Nom', '').strip()
-        new_email = request.form.get('Email', '').strip()
-        new_username = request.form.get("Nom d'utilisateur", '').strip()
+        new_name = request.form.get('name', '').strip()
+        new_email = request.form.get('email', '').strip()
+        new_username = request.form.get('username', '').strip()
 
         # pb : après strip les données se vident
 

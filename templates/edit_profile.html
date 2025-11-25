@@ -6,67 +6,110 @@
     <title>Modifier le profil</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<style>
-    /* Styles additionnels */
-    h1 {
-        color: #333;
-        margin-bottom: 30px;
-    }
-    .form-group {
-        margin-bottom: 20px;
-    }
-    label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-        color: #555;
-    }
-    input[type="text"],
-    input[type="email"] {
-        width: 100%;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-    input[type="text"]:focus,
-    input[type="email"]:focus {
-        outline: none;
-        border-color: #4CAF50;
-    }
-</style>
 <body>
-    <div class="container">
-        <h1>Modifier mon profil</h1>
-        
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }}">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        
-        <form method="POST" action="{{ url_for('edit_profile') }}">
-            <div class="form-group">
-                <label for="name">Nom complet</label>
-                <input type="text" id="name" name="name" value="{{ user.name }}" required>
-            </div>
+<!-- 🧭 Sidebar -->
+    <div class="sidebar">
+        <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+
+        <div class="container-search">
+            <form method="GET" action="{{ url_for('search') }}" class="search-form">
+                <input 
+                    type="text" 
+                    name="q" 
+                    placeholder="Rechercher un profil..."
+                    aria-label="Rechercher"
+                    class="search-input-with-icon">
+            </form>
+        </div>
+
+        <nav class="sidebar-nav">
+            <form action="{{ url_for('feed') }}" method="get">
+                <button 
+                    type="submit" 
+                    class="sidebar-btn {% if request.endpoint == 'feed' %}active{% endif %}">
+                    Fil d’actualité
+                </button>
+            </form>
+
+            <form action="{{ url_for('profile') }}" method="get">
+                <button 
+                    type="submit" 
+                    class="sidebar-btn {% if request.endpoint == 'profile' %}active{% endif %}">
+                    Profil
+                </button>
+            </form>
+
+            <!-- Bouton supprimer le compte -->
+            <form action="{{ url_for('delete_account') }}" method="get">
+                <button 
+                    type="submit"
+                    class="sidebar-btn btn-danger">
+                    Supprimer mon compte
+                </button>
+            </form>
+
+
+        </nav>
+    </div>
+
+    <!-- Contenu principal -->
+    <div class="main-content bg-light">
+        <div class="container container--lg">
+            <h1 class="h1">Modifier mon profil</h1>
             
-            <div class="form-group">
-                <label for="username">Nom d'utilisateur</label>
-                <input type="text" id="username" name="username" value="{{ user.username }}" required>
-            </div>
+            <!-- Messages flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
             
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="{{ user.email }}" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-            <a href="{{ url_for('profile') }}" class="btn btn-secondary">Annuler</a>
-        </form>
+            <!-- Formulaire -->
+            <form method="POST" action="{{ url_for('edit_profile') }}" class="form">
+                <div style="margin-bottom: 20px; text-align: left;">
+                    <label for="name" class="label">Nom complet</label>
+                    <input 
+                        type="text" 
+                        id="name" 
+                        name="name" 
+                        class="input" 
+                        value="{{ user.name }}" 
+                        placeholder="Entrez votre nom complet"
+                        required>
+                </div>
+                
+                <div style="margin-bottom: 20px; text-align: left;">
+                    <label for="username" class="label">Nom d'utilisateur</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        class="input" 
+                        value="{{ user.username }}" 
+                        placeholder="Choisissez un nom d'utilisateur"
+                        required>
+                </div>
+                
+                <div style="margin-bottom: 20px; text-align: left;">
+                    <label for="email" class="label">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="input" 
+                        value="{{ user.email }}" 
+                        placeholder="votre@email.com"
+                        required>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 30px;">
+                    <button type="submit" class="btn">Enregistrer les modifications</button>
+                    <a href="{{ url_for('profile') }}" class="btn" style="background-color: #6c757d;">Annuler</a>
+                </div>
+            </form>
+        </div>
     </div>
 </body>
 </html>

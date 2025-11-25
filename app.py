@@ -406,6 +406,9 @@ from flask import render_template
 
 @app.route('/feed')
 def feed():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
     user = User.query.filter_by(username=session['username']).first()
     followed_users = user.followed.all()
     # Tries les posts par date_posted (du plus récent au plus ancien)
@@ -416,6 +419,23 @@ def feed():
     return render_template('timeline.html', posts=posts)
  
 
+    # Récupérer l'offset (par défaut 0)
+    offset = int(request.args.get('offset', 0))
+
+    posts = (
+        Post.query
+        .filter(Post.user_id.in_([u.id for u in followed_users]))
+        .order_by(Post.date_posted.desc())
+        .offset(offset)
+        .limit(20)
+        .all()
+    )
+
+    return render_template(
+        'timeline.html',
+        posts=posts,
+        offset=offset
+    )
 
 # ------------------ EXECUTION ------------------
 

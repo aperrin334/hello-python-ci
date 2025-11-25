@@ -62,6 +62,7 @@ body {
 }
 
 .sidebar-btn {
+    display: block;
     width: 100%;
     background-color: #f6f6f6;
     border: none;
@@ -90,15 +91,7 @@ body {
 .sidebar-btn.btn-danger {
     width: 100%;
     background-color: #f6f6f6;
-    border: none;
     color: #000000;
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 10px 15px;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.3s ease;
 }
 
 .sidebar-btn.btn-danger:hover {
@@ -332,34 +325,43 @@ img.logo {
 
 /* BOUTON */
 .btn {
-background-color: var(--bleu-2);
-color: white;
-padding: 12px 24px;
-border: none;
-border-radius: var(--radius-md);
-font-size: 16px;
-cursor: pointer;
-transition: background-color 0.3s, transform 0.2s;
+    background-color: var(--bleu-2);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+
+    /* ✅ Pour que les liens <a> ressemblent à un bouton */
+    text-decoration: none; 
+    display: inline-block;
 }
 
-
-/* Effet au survol */
+/* États du bouton */
 .btn:hover {
-background-color: var(--bleu-1);
-transform: scale(1.05);
+    background-color: var(--bleu-1);
+    transform: scale(1.05);
 }
 
-/* Effet quand le bouton est cliqué */
 .btn:active {
-background-color: var(--bleu-1);
-transform: scale(0.95);
+    background-color: var(--bleu-1);
+    transform: scale(0.95);
 }
 
 .btn:disabled {
-  background-color: #aaa;
-  cursor: not-allowed;
+    background-color: #aaa;
+    cursor: not-allowed;
 }
 
+/* Spécifiquement pour les liens */
+.btn:link,
+.btn:visited,
+.btn:hover,
+.btn:active {
+    text-decoration: none !important; /* supprime le soulignement dans tous les états */
+}
 .alert {
     padding: 10px;
     margin: 10px 0;

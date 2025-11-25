@@ -89,8 +89,10 @@
         </form>
 
         <!-- Bouton supprimer le compte -->
-        <form action="{{ url_for('delete_account') }}" method="post">
-            <button type="submit" class="sidebar-btn btn-danger">
+        <form action="{{ url_for('delete_account') }}" method="get">
+            <button 
+                type="submit"
+                class="sidebar-btn btn-danger">
                 Supprimer mon compte
             </button>
         </form>

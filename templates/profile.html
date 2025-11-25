@@ -2,270 +2,211 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Profil de {{ user.name }}</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
-    <style>
-        body {
-            display: flex;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background-color: #343a40;
-            color: white;
-            padding: 20px;
-            position: fixed;
-            height: 100%;
-            top: 0;
-            left: 0;
-        }
-
-        .sidebar h3 {
-            text-align: center;
-            color: #fff;
-            margin-bottom: 30px;
-        }
-
-        .sidebar a {
-            display: block;
-            color: #ccc;
-            text-decoration: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        .sidebar a:hover,
-        .sidebar a.active {
-            background-color: #495057;
-            color: white;
-        }
-
-        img.logo {
-            width: 120px;
-            margin-bottom: 10px;
-        }
-        /* Barre de recherche */
-        .search-box input {
-            width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-
-        /* Contenu principal */
-        .main-content {
-            margin-left: 270px;
-            padding: 30px;
-            width: 100%;
-        }
-
-        /* Flash messages */
-        .alert {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 4px;
-        }
-        .alert-error {
-            background-color: #ffdddd;
-            color: #d8000c;
-            border: 1px solid #d8000c;
-        }
-        .alert-success {
-            background-color: #ddffdd;
-            color: #4f8a10;
-            border: 1px solid #4f8a10;
-        }
-
-        .sidebar a.disabled {
-             pointer-events: none;
-            opacity: 0.6;
-            cursor: default;
-        }
-
-        .biography-section {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-left: 4px solid #0d6efd;
-        }
-        .biography-text {
-            white-space: pre-line;
-            font-style: italic;
-            color: #495057;
-        }
-    </style>
+    <title>Profil de {{ user.username }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 <body>
 
-    <!-- 🧭 Sidebar -->
-    <div class="sidebar">
-        <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+<!-- ✅ Messages flash -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert" style="transition: opacity 0.5s;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(function() {
+        const container = document.getElementById('flash-container');
+        if (container) {
+          container.style.opacity = '0';
+          setTimeout(() => container.remove(), 500);
+        }
+      }, 3000);
+    </script>
+  {% endif %}
+{% endwith %}
 
-        <!-- Barre de recherche -->
-        <form class="search-box" method="GET" action="{{ url_for('search') }}">
-            <input type="text" name="q" placeholder="🔍 Rechercher un profil..." aria-label="Rechercher">
+<!-- 🧭 Sidebar -->
+<div class="sidebar">
+    <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+
+    <div class="container-search">
+        <form method="GET" action="{{ url_for('search') }}" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Rechercher un profil..."
+                aria-label="Rechercher"
+                class="search-input-with-icon">
+        </form>
+    </div>
+
+    <nav class="sidebar-nav">
+        <form action="{{ url_for('feed') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'feed' %}active{% endif %}">
+                Fil d’actualité
+            </button>
         </form>
 
-        <!-- Liens -->
-          <!-- Timeline -->
-     <a href="{{ url_for('feed') }}" class="btn btn-primary">
-    Fil d'actualité
-    </a>
-          <a href="{{ url_for('profile') }}" 
-        class="{% if request.endpoint == 'profile' %}active disabled{% endif %}" 
-        {% if request.endpoint == 'profile' %}tabindex="-1" aria-disabled="true"{% endif %}>
-        👤 Profil
-    </a>
-         <a href="{{ url_for('logout') }}">🚪 Déconnexion</a>
-         <a href="{{ url_for('delete_account') }}" class="btn btn-danger btn-sm me-2">
-             Supprimer mon compte</a>
-    </div>
+        <form action="{{ url_for('profile') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'profile' %}active{% endif %}">
+                Profil
+            </button>
+        </form>
 
-    <!-- 💬 Contenu principal -->
-    <div class="main-content bg-light">
+        <!-- Bouton supprimer le compte -->
+        <form action="{{ url_for('delete_account') }}" method="get">
+            <button 
+                type="submit"
+                class="sidebar-btn btn-danger">
+                Supprimer mon compte
+            </button>
+        </form>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <div id="flash-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
-              {% for category, message in messages %}
-                {% if category == 'success' %}
-                  <div class="alert alert-success" role="alert" style="transition: opacity 0.5s;">
-                    {{ message }}
-                  </div>
-                {% endif %}
-              {% endfor %}
+
+    </nav>
+</div>
+
+
+<!-- 💬 Contenu principal -->
+<div class="main-content bg-light">
+    <div class="container container--lg">
+
+        <!-- Titre -->
+        <div class="flex-between">
+            <h1 class="h1">Profil de {{ user.username }}</h1>
+            <form action="{{ url_for('logout') }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn">Se déconnecter</button>
+            </form>
+        </div>
+
+        <!-- Informations utilisateur -->
+        <div class="row">
+            <div class="col">
+                <p><b>Nom :</b> {{ user.name }}</p>
+                <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
+                <p><b>Email :</b> {{ user.email }}</p>
+                <p>
+                    <b>Followers :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
+                    <b>Suivi(e)s :</b> <span class="badge bg-primary">{{ user.following_count }}</span>
+                </p>
             </div>
-            <script>
-              setTimeout(function() {
-                const container = document.getElementById('flash-container');
-                if (container) {
-                  container.style.opacity = '0';
-                  setTimeout(() => container.remove(), 500);
-                }
-              }, 3000);
-            </script>
-          {% endif %}
-        {% endwith %}
-
-<div class="container mt-5">
-    <!-- Barre du haut avec bouton de déconnexion avec le bouton supprimer le compte -->
-<div class="mb-4">
-    <div class="d-flex justify-content-end mb-2">
-
-    </div>
-    <h2>👤 Profil de {{ user.name }}</h2>
-    <!-- Informations de base -->
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <p><b>Nom :</b> {{ user.name }}</p>
-            <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
-            <p><b>Email :</b> {{ user.email }}</p>
-        <p>
-            <b>Followers :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
-            <b>Suivi(e)s :</b> <span class="badge bg-primary">{{ user.following_count }}</span>
-        </p>
         </div>
-    </div>
 
-    <!-- Section Biographie -->
-    <div class="biography-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4 class="mb-0">📜 Ma biographie</h4>
-            <a href="{{ url_for('edit_biography') }}" class="btn btn-sm btn-outline-primary">Modifier</a>
-        </div>
-        {% if user.biography %}
-            <p class="biography-text">{{ user.biography }}</p>
-        {% else %}
-            <p class="biography-text text-muted">Aucune biographie. <a href="{{ url_for('edit_biography') }}">Ajouter une biographie</a></p>
-        {% endif %}
-    </div>
+        <hr>
 
-    <hr>
-
-    <!-- Création de publication -->
-    <h4>📝 Créer une publication</h4>
-    <form method="POST" action="{{ url_for('create_post') }}">
-        <div class="mb-3">
-            <textarea class="form-control" name="content" rows="3" placeholder="Écrivez quelque chose..."></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary">Publier</button>
-    </form>
-        
-
-
-    <hr>
-
-    <!-- Publications -->
-    <h4>Vos publications</h4>
-        {% for post in posts %}
-        <div class="card mb-3">
-            <div class="card-body">
-                <!-- MODIFICATION : Ajout du nom de l'auteur du post avec un lien -->
-                <h5 class="card-title mb-2">
-                    <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
-                        {{ post.author.name }}
-                    </a>
-                </h5>
-                <p class="card-text">{{ post.content }}</p>
-                <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
-
-                {% if current_user %}
-                    {% set liked = post.id in liked_post_ids %}
-                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
-                        </button>
-                    </form>
-                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-danger btn-sm">
-                        Supprimer 
-                        </button>
-                    </form>
-                {% endif %}
-
-                {% if current_user %}
-                <form action="{{ url_for('create_comment', post_id=post.id) }}" method="POST" class="mb-2 mt-2 d-flex">
-                    <input type="text" name="content" class="form-control form-control-sm me-2" placeholder="Écrire un commentaire...">
-                    <button type="submit" class="btn btn-sm btn-primary">Envoyer</button>
-                </form>
-                {% endif %}
-
-            <!-- Liste des commentaires -->
-            {% for comment in post.comments %}
-            <div class="ms-3 mb-1">
-                <small>
-                    <!-- MODIFICATION : Ajout d'un lien sur l'auteur du commentaire -->
-                    <b>
-                        <a href="{{ url_for('user_profile', username=comment.author.username) }}" class="text-decoration-none text-dark">
-                            {{ comment.author.name }}
-                        </a>:
-                    </b>
-                    {{ comment.content }}
-                    <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
-                </small>
-                {% if current_user %}
-                    {% set liked_comment = comment.id in liked_comment_ids %}
-                    <form action="{{ url_for('like_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="btn btn-sm {% if liked_comment %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                            {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
-                        </button>
-                    </form>
-                {% endif %}
+        <!-- Biographie -->
+        <div class="biography-section">
+            <div class="flex-between">
+                <h2>Ma biographie</h2>
+                <a href="{{ url_for('edit_biography') }}" class="btn">Modifier</a>
             </div>
+            {% if user.biography %}
+                <p class="biography-text">{{ user.biography }}</p>
+            {% else %}
+                <p class="biography-text text-muted">Aucune biographie. <a href="{{ url_for('edit_biography') }}">Ajouter une biographie</a></p>
+            {% endif %}
+        </div>
+
+        <hr>
+
+        <!-- Création d'une publication -->
+        <h2>Créer une publication</h2>
+        <form method="POST" action="{{ url_for('create_post') }}" style="width: 100%;">
+            <textarea class="form-control textarea" name="content" rows="3" placeholder="Écrivez quelque chose..."></textarea>
+            <br>
+            <button type="submit" class="btn btn-primary w-100">Publier</button>
+        </form>
+
+        <hr>
+
+        <!-- Publications avec style moderne -->
+        <h3>Vos publications</h3>
+            {% if posts %}
+
+            {% for post in posts %}
+                <div class="container--lg posts-container" id="posts-container" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="post-card" data-post-id="{{ post.id }}" style="display: flex; gap: 15px; align-items: flex-start;">
+
+                        <!-- Partie gauche : cadre blanc avec texte et commentaires -->
+                        <div style="flex: 1; background-color: #ffffff; padding: 15px; border-radius: var(--radius-md); box-shadow: 2px 2px 8px rgba(0,0,0,0.1);">
+
+                            <!-- Contenu du post -->
+                            <div style="font-size: 1.2rem; margin-bottom: 10px;">
+                                <h5 class="card-title mb-2">
+                                    <a href="{{ url_for('user_profile', username=post.author.username) }}" class="text-decoration-none text-dark">
+                                        {{ post.author.username }}
+                                    </a>
+                                </h5>
+                                <p class="post-content">{{ post.content }}</p>
+                                <small class="text-muted">Posté le {{ post.date_posted.strftime('%d/%m/%Y à %H:%M') }}</small>
+                            </div>
+
+                            <!-- Bouton Like -->
+                                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                                    {% set liked = post.id in liked_post_ids %}
+                                    <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
+                                        </button>
+                                    </form>
+                                    <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">Supprimer</button>
+                                    </form>
+                                </div>
+                        </div>
+                    </div>
+
+                    <!-- Formulaire commentaire -->
+                    <form action="{{ url_for('create_comment', post_id=post.id) }}" method="POST" style="display: flex; width: 100%; gap: 10px; margin-top: 10px;">
+                        <input type="text" name="content" class="form-control form-control-sm" placeholder="Écrire un commentaire..." style="flex: 1; min-width: 0;">
+                        <button type="submit" class="btn btn-sm btn-primary">Envoyer</button>
+                    </form>
+
+
+                    <!-- Commentaires dans cadre gris -->
+                    <div style="background-color: var(--background-2); padding: 10px; border-radius: var(--radius-sm); margin-top: 10px;">
+                        {% for comment in post.comments %}
+                        <div style="margin-bottom: 5px; display: flex; align-items: center; gap: 5px;">
+                            <small class="comment-text">
+                                <b><a href="{{ url_for('user_profile', username=comment.author.username) }}" class="text-decoration-none text-dark">{{ comment.author.username }}</a>:</b> {{ comment.content }}
+                                <span class="text-muted">— {{ comment.date_posted.strftime('%d/%m/%Y à %H:%M') }}</span>
+                            </small>
+                                {% set liked_comment = comment.id in liked_comment_ids %}
+                                <form action="{{ url_for('like_comment', comment_id=comment.id) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm {% if liked_comment %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                                        {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
+                                    </button>
+                                </form>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
             {% endfor %}
-        </div>
+        {% else %}
+        <p>Vous n'avez aucun post.</p>
+        {% endif %}
+
+        <!-- Loader -->
+        <div id="loader" style="display:none; text-align:center; padding:20px;">Chargement...</div>
+
     </div>
-    {% endfor %}
 </div>
 
-</div>
 </body>
 </html>
+
+
+
+
+
+
+

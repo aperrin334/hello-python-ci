@@ -254,6 +254,71 @@ def delete_post(post_id):
     return redirect(url_for('profile'))
 
 
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+
+    if request.method == 'POST':
+        # Récupérer les données (mais ne pas forcer à changer quoi que ce soit)
+        new_name = request.form.get('name', '').strip()
+        new_email = request.form.get('email', '').strip()
+        new_username = request.form.get('username', '').strip()
+        new_password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+
+        # --- Vérifications uniquement si les champs sont modifiés ---
+
+        # Vérifier email uniquement si un nouvel email est fourni
+        if new_email and new_email != user.email:
+            existing_email = User.query.filter_by(email=new_email).first()
+            if existing_email:
+                flash('Cet email est déjà utilisé.', 'error')
+                return render_template('edit_profile.html', user=user)
+
+        # Vérifier username uniquement si un nouveau est fourni
+        if new_username and new_username != user.username:
+            existing_username = User.query.filter_by(username=new_username).first()
+            if existing_username:
+                flash("Ce nom d'utilisateur est déjà pris.", 'error')
+                return render_template('edit_profile.html', user=user)
+
+        # --- Mise à jour partielle ---
+
+        if new_name:
+            user.name = new_name
+        
+        if new_email:
+            user.email = new_email
+        
+        if new_username:
+            user.username = new_username
+
+        # Mot de passe uniquement si fourni
+        if new_password:
+            if new_password != confirm_password:
+                flash('Les mots de passe ne correspondent pas.', 'error')
+                return render_template('edit_profile.html', user=user)
+            if len(new_password) < 6:
+                flash('Le mot de passe doit contenir au moins 6 caractères.', 'error')
+                return render_template('edit_profile.html', user=user)
+            user.password = generate_password_hash(new_password)
+
+        db.session.commit()
+
+        # Mettre à jour session uniquement si username changé
+        if new_username:
+            session['username'] = new_username
+
+        flash('Profil mis à jour avec succès !', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('edit_profile.html', user=user)
+
+
+
 @app.route('/comment/<int:post_id>', methods=['POST'])
 def create_comment(post_id):
     if 'username' not in session:
@@ -452,3 +517,4 @@ def feed():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
+

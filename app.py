@@ -282,6 +282,35 @@ def like_comment(comment_id):
         db.session.add(new_like)
     db.session.commit()
     return redirect(request.referrer or url_for('profile'))
+
+@app.route('/delete_comment/<int:comment_id>', methods=['POST'])
+def delete_comment(comment_id):
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+    comment = Comment.query.get_or_404(comment_id)
+
+    # L'auteur du commentaire
+    is_comment_author = (comment.user_id == user.id)
+
+    # L'auteur du post
+    post = Post.query.get(comment.post_id)
+    is_post_owner = (post.user_id == user.id)
+
+    if not (is_comment_author or is_post_owner):
+        flash("Vous ne pouvez supprimer que vos propres commentaires ou ceux sous vos publications.", "error")
+        return redirect(request.referrer or url_for('profile'))
+
+    # Supprimer les likes associés
+    CommentLike.query.filter_by(comment_id=comment_id).delete()
+
+    # Supprimer le commentaire
+    db.session.delete(comment)
+    db.session.commit()
+
+    flash("Commentaire supprimé.", "success")
+    return redirect(request.referrer or url_for('profile'))
 ##################
 
 ##########FOLLOWS/UNFOLLOWS
@@ -341,6 +370,12 @@ def user_profile(username):
         current_user = User.query.filter_by(username=session['username']).first()
         liked_post_ids = [like.post_id for like in Like.query.filter_by(user_id=current_user.id).all()]
         liked_comment_ids = [like.comment_id for like in CommentLike.query.filter_by(user_id=current_user.id).all()]
+        # 🐞 DEBUG : Afficher IDs
+    print("CURRENT USER ID:", current_user.id if current_user else None)
+    for post in posts:
+        print(f"POST ID: {post.id}, AUTHOR ID: {post.user_id}")
+        for comment in post.comments:
+            print(f"COMMENT ID: {comment.id}, AUTHOR ID: {comment.user_id}")
     return render_template(
         'user_profile.html',
         user=user,

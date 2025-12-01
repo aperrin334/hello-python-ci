@@ -92,7 +92,7 @@
                                     {% set liked = post.id in liked_post_ids %}
                                     <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
+                                            {% if liked %}❤️{% else %}🤍{% endif %} J'aime  ({{ post.likes | length }})
                                         </button>
                                     </form>
                                 </div>

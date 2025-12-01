@@ -102,9 +102,9 @@
             <div class="col">
                 <p><b>Nom :</b> {{ user.name }}</p>
                 <p><b>Nom d'utilisateur :</b> {{ user.username }}</p>
-                <p><b>Email :</b> {{ user.email }}</p>
+                <p><b>Mail :</b> {{ user.email }}</p>
                 <p>
-                    <b>Followers :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
+                    <b>Abonné(e)s :</b> <span class="badge bg-primary">{{ user.followers_count }}</span>
                     <b>Suivi(e)s :</b> <span class="badge bg-primary">{{ user.following_count }}</span>
                 </p>
             </div>
@@ -164,7 +164,7 @@
                                     {% set liked = post.id in liked_post_ids %}
                                     <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
+                                            {% if liked %}❤️{% else %}🤍{% endif %} J'aime ({{ post.likes | length }})
                                         </button>
                                     </form>
                                     <form action="{{ url_for('delete_post', post_id=post.id) }}" method="POST" style="display:inline;">

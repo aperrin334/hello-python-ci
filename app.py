@@ -254,6 +254,71 @@ def delete_post(post_id):
     return redirect(url_for('profile'))
 
 
+@app.route('/edit_profile', methods=['GET', 'POST'])
+def edit_profile():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+
+    user = User.query.filter_by(username=session['username']).first()
+
+    if request.method == 'POST':
+        # Récupérer les données (mais ne pas forcer à changer quoi que ce soit)
+        new_name = request.form.get('name', '').strip()
+        new_email = request.form.get('email', '').strip()
+        new_username = request.form.get('username', '').strip()
+        new_password = request.form.get('password', '').strip()
+        confirm_password = request.form.get('confirm_password', '').strip()
+
+        # --- Vérifications uniquement si les champs sont modifiés ---
+
+        # Vérifier email uniquement si un nouvel email est fourni
+        if new_email and new_email != user.email:
+            existing_email = User.query.filter_by(email=new_email).first()
+            if existing_email:
+                flash('Cet email est déjà utilisé.', 'error')
+                return render_template('edit_profile.html', user=user)
+
+        # Vérifier username uniquement si un nouveau est fourni
+        if new_username and new_username != user.username:
+            existing_username = User.query.filter_by(username=new_username).first()
+            if existing_username:
+                flash("Ce nom d'utilisateur est déjà pris.", 'error')
+                return render_template('edit_profile.html', user=user)
+
+        # --- Mise à jour partielle ---
+
+        if new_name:
+            user.name = new_name
+        
+        if new_email:
+            user.email = new_email
+        
+        if new_username:
+            user.username = new_username
+
+        # Mot de passe uniquement si fourni
+        if new_password:
+            if new_password != confirm_password:
+                flash('Les mots de passe ne correspondent pas.', 'error')
+                return render_template('edit_profile.html', user=user)
+            if len(new_password) < 6:
+                flash('Le mot de passe doit contenir au moins 6 caractères.', 'error')
+                return render_template('edit_profile.html', user=user)
+            user.password = generate_password_hash(new_password)
+
+        db.session.commit()
+
+        # Mettre à jour session uniquement si username changé
+        if new_username:
+            session['username'] = new_username
+
+        flash('Profil mis à jour avec succès !', 'success')
+        return redirect(url_for('profile'))
+
+    return render_template('edit_profile.html', user=user)
+
+
+
 @app.route('/comment/<int:post_id>', methods=['POST'])
 def create_comment(post_id):
     if 'username' not in session:
@@ -409,35 +474,47 @@ def feed():
     if 'username' not in session:
         return redirect(url_for('login'))
 
-    user = User.query.filter_by(username=session['username']).first()
-    followed_users = user.followed.all()
-    # Tries les posts par date_posted (du plus récent au plus ancien)
-    posts = Post.query.filter(Post.user_id.in_([u.id for u in followed_users])) \
-                      .order_by(Post.date_posted.desc()) \
-                      .limit(20) \
-                      .all()
-    return render_template('timeline.html', posts=posts)
- 
-
-    # Récupérer l'offset (par défaut 0)
+     # Récupérer l'offset (par défaut 0)
     offset = int(request.args.get('offset', 0))
 
-    posts = (
-        Post.query
-        .filter(Post.user_id.in_([u.id for u in followed_users]))
-        .order_by(Post.date_posted.desc())
-        .offset(offset)
-        .limit(20)
-        .all()
-    )
+    user = User.query.filter_by(username=session['username']).first()
+    followed_users = user.followed.all()
+    followed_ids = [u.id for u in followed_users]
+
+    # Si aucun suivi, on renvoie une liste vide
+    if not followed_ids:
+        posts = []
+        total_count = 0
+    else:
+        total_count = Post.query.filter(Post.user_id.in_(followed_ids)).count()
+        posts = (
+            Post.query
+            .filter(Post.user_id.in_(followed_ids))
+            .order_by(Post.date_posted.desc())
+            .offset(offset)
+            .limit(20)
+            .all()
+        )
+
+    # IDs des likes pour l'affichage des boutons
+    liked_post_ids = [like.post_id for like in Like.query.filter_by(user_id=user.id).all()]
+    liked_comment_ids = [like.comment_id for like in CommentLike.query.filter_by(user_id=user.id).all()]
+
+    has_more = (offset + 20) < total_count
 
     return render_template(
         'timeline.html',
         posts=posts,
-        offset=offset
+        offset=offset,
+        has_more=has_more,
+        liked_post_ids=liked_post_ids,
+        liked_comment_ids=liked_comment_ids
     )
+
+
 
 # ------------------ EXECUTION ------------------
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
+

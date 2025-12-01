@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier mon profil - InsaGram</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .main-content {
+            display: flex;
+            justify-content: center;
+        }
+
+        .container.container--lg {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .edit-profile-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+        
+        .edit-profile-form {
+            width: 100%;
+            max-width: 600px;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- 🧭 Sidebar -->
+<div class="sidebar">
+    <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+
+    <div class="container-search">
+        <form method="GET" action="{{ url_for('search') }}" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Rechercher un profil..."
+                aria-label="Rechercher"
+                class="search-input-with-icon">
+        </form>
+    </div>
+
+    <nav class="sidebar-nav">
+        <form action="{{ url_for('feed') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'feed' %}active{% endif %}">
+                Fil d'actualité
+            </button>
+        </form>
+
+        <form action="{{ url_for('profile') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'profile' %}active{% endif %}">
+                Profil
+            </button>
+        </form>
+
+        <form action="{{ url_for('edit_profile') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'edit_profile' %}active{% endif %}">
+                ✏️ Modifier mon profil
+            </button>
+        </form>
+
+        <form action="{{ url_for('delete_account') }}" method="get">
+            <button 
+                type="submit"
+                class="sidebar-btn btn-danger">
+                Supprimer mon compte
+            </button>
+        </form>
+    </nav>
+</div>
+
+<!-- 💬 Contenu principal -->
+<div class="main-content bg-light">
+    <div class="container container--lg">
+
+        <h1 class="h1" style="text-align: center;">Modifier mon profil</h1>
+
+        <!-- ✅ Messages flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="edit-profile-wrapper">
+                    <div class="edit-profile-form">
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}" role="alert">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulaire de modification -->
+        <div class="edit-profile-wrapper">
+            <form method="POST" action="{{ url_for('edit_profile') }}" class="edit-profile-form">
+
+                <!-- Nom complet -->
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nom complet <small class="text-muted">(optionnel)</small></label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="name" 
+                        name="name" 
+                        value="{{ user.name }}"
+                        placeholder="Laisser vide pour garder l'actuel">
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email <small class="text-muted">(optionnel)</small></label>
+                    <input 
+                        type="email" 
+                        class="form-control" 
+                        id="email" 
+                        name="email" 
+                        value="{{ user.email }}"
+                        placeholder="Laisser vide pour garder l'actuel">
+                </div>
+
+                <!-- Nom d'utilisateur -->
+                <div class="mb-3">
+                    <label for="username" class="form-label">Nom d'utilisateur <small class="text-muted">(optionnel)</small></label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        id="username" 
+                        name="username" 
+                        value="{{ user.username }}"
+                        placeholder="Laisser vide pour garder l'actuel">
+                </div>
+
+                <!-- Nouveau mot de passe -->
+                <div class="mb-3">
+                    <label for="password" class="form-label">Nouveau mot de passe <small class="text-muted">(optionnel)</small></label>
+                    <input 
+                        type="password" 
+                        class="form-control" 
+                        id="password" 
+                        name="password"
+                        minlength="6"
+                        placeholder="Laisser vide pour garder l'actuel">
+                </div>
+
+                <!-- Confirmer le mot de passe -->
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirmer le mot de passe <small class="text-muted">(si changement)</small></label>
+                    <input 
+                        type="password" 
+                        class="form-control" 
+                        id="confirm_password" 
+                        name="confirm_password"
+                        minlength="6"
+                        placeholder="Confirmer le nouveau mot de passe">
+                </div>
+
+                <!-- Boutons -->
+                <div style="display: flex; gap: 12px; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Sauvegarder les modifications</button>
+                    <a href="{{ url_for('profile') }}" class="btn" style="flex: 1; text-align: center;">Annuler</a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

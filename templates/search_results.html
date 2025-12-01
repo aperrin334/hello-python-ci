@@ -3,29 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <title>Résultats de recherche</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .results-container {
+            background: linear-gradient(145deg, var(--background-2), var(--background));
+            border-radius: var(--radius-md);
+            padding: 30px;
+            box-shadow: 6px 6px 14px rgba(0, 0, 0, 0.2), -6px -6px 14px rgba(255, 255, 255, 0.1);
+        }
+
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            border-radius: var(--radius-sm);
+            background: #fff;
+            box-shadow: inset 1px 1px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .list-group-item:hover {
+            transform: scale(1.01);
+            box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .list-group-item span {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .list-group-item .btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .text-muted {
+            margin-top: 20px;
+            font-style: italic;
+            color: #777;
+        }
+    </style>
 </head>
-<body class="bg-light">
-<div class="container mt-5">
-    <a href="{{ url_for('profile') }}" class="btn btn-secondary mb-3">← Retour à mon profil</a>
 
-    <h3>Résultats pour : "{{ query }}"</h3>
-    <hr>
+<body>
 
-    {% if results %}
-        <ul class="list-group">
-            {% for user in results %}
-                {% if user.username != session['username'] %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <span>{{ user.name }}</span>
-                    <a href="{{ url_for('user_profile', username=user.username) }}" class="btn btn-sm btn-outline-primary">Voir le profil</a>
-                </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-muted">Aucun utilisateur trouvé.</p>
-    {% endif %}
+    <!-- 🧭 Sidebar -->
+<div class="sidebar">
+    <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
+
+    <div class="container-search">
+        <form method="GET" action="{{ url_for('search') }}" class="search-form">
+            <input 
+                type="text" 
+                name="q" 
+                placeholder="Rechercher un profil..."
+                aria-label="Rechercher"
+                class="search-input-with-icon">
+        </form>
+    </div>
+
+    <nav class="sidebar-nav">
+        <form action="{{ url_for('feed') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'feed' %}active{% endif %}">
+                Fil d’actualité
+            </button>
+        </form>
+
+        <form action="{{ url_for('profile') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn {% if request.endpoint == 'profile' %}active{% endif %}">
+                Profil
+            </button>
+        </form>
+
+        <!-- Bouton modifier le profil -->
+        <form action="{{ url_for('edit_profile') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn">
+                Modifier mon profil
+            </button>
+        </form>
+
+        <!-- Bouton supprimer le compte -->
+        <form action="{{ url_for('delete_account') }}" method="get">
+            <button 
+                type="submit"
+                class="sidebar-btn btn-danger">
+                Supprimer mon compte
+            </button>
+        </form>
+    </nav>
+</div>
+
+<div class="main-content bg-light">
+<div class="container--lg">
+    <div class="search-header">
+        <h2>Résultats pour : <em>"{{ query }}"</em></h2>
+        <a href="{{ url_for('profile') }}" class="btn">← Retour au profil</a>
+    </div>
+
+    <div class="results-container">
+        {% if results %}
+            <ul class="list-group">
+                {% for user in results %}
+                    <li class="list-group-item">
+                        <span><b>{{ user.username }}</b> <small>({{ user.name }})</small></span>
+                        <a href="{{ url_for('user_profile', username=user.username) }}" class="btn">Voir le profil</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-muted">Aucun utilisateur trouvé pour cette recherche.</p>
+        {% endif %}
+    </div>
+</div>
 </div>
 </body>
 </html>

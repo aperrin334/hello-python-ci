@@ -40,6 +40,15 @@
             </button>
         </form>
 
+        <!-- Bouton modifier le profil -->
+        <form action="{{ url_for('edit_profile') }}" method="get">
+            <button 
+                type="submit" 
+                class="sidebar-btn">
+                Modifier mon profil
+            </button>
+        </form>
+
                 <!-- Bouton supprimer le compte -->
         <form action="{{ url_for('delete_account') }}" method="get">
             <button 
@@ -83,7 +92,7 @@
                                     {% set liked = post.id in liked_post_ids %}
                                     <form action="{{ url_for('like_post', post_id=post.id) }}" method="POST" style="display:inline;">
                                         <button type="submit" class="btn btn-sm {% if liked %}btn-danger{% else %}btn-outline-danger{% endif %}">
-                                            {% if liked %}❤️{% else %}🤍{% endif %} Like ({{ post.likes | length }})
+                                            {% if liked %}❤️{% else %}🤍{% endif %} J'aime  ({{ post.likes | length }})
                                         </button>
                                     </form>
                                 </div>
@@ -116,6 +125,18 @@
                     </div>
                 </div>
             {% endfor %}
+
+            <!-- Bouton "Voir 20 de plus" -->
+            <div style="margin-top: 20px; text-align: center;">
+                {% if has_more %}
+                <form action="{{ url_for('feed') }}" method="get">
+                    <input type="hidden" name="offset" value="{{ offset + 20 }}">
+                    <button type="submit" class="btn btn-outline-primary">Voir 20 publications de plus</button>
+                </form>
+                {% else %}
+                <small class="text-muted">Plus de posts à afficher.</small>
+                {% endif %}
+            </div>   
         {% else %}
         <p>Aucun post à afficher. Suivez des utilisateurs pour voir leurs publications !</p>
         {% endif %}

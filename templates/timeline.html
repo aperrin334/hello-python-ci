@@ -8,6 +8,27 @@
 </head>
 <body>
 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div id="flash-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert" style="transition: opacity 0.5s;">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+    <script>
+      setTimeout(function() {
+        const container = document.getElementById('flash-container');
+        if (container) {
+          container.style.opacity = '0';
+          setTimeout(() => container.remove(), 500);
+        }
+      }, 3000);
+    </script>
+  {% endif %}
+{% endwith %}
+
 <!-- 🧭 Sidebar -->
 <div class="sidebar">
     <img src="{{ url_for('static', filename='images/LOGO_sidebar.png') }}" alt="Logo InsaGram" class="logo">
@@ -120,23 +141,35 @@
                                         {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
                                     </button>
                                 </form>
+                                {% if session.get('username') and session.get('username') == comment.author.username %}
+                                <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" style="display:inline; margin-left:8px;">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Supprimer ce commentaire ?');">Supprimer</button>
+                                </form>
+                                {% endif %}
                         </div>
                         {% endfor %}
                     </div>
                 </div>
             {% endfor %}
 
-            <!-- Bouton "Voir 20 de plus" -->
-            <div style="margin-top: 20px; text-align: center;">
+            <div style="margin-top: 20px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+                {% if offset > 0 %}
+                <form action="{{ url_for('feed') }}" method="get">
+                    <input type="hidden" name="offset" value="{{ offset - 20 }}">
+                    <button type="submit" class="btn btn-outline-primary">← Retour</button>
+                </form>
+                {% endif %}
+                
                 {% if has_more %}
                 <form action="{{ url_for('feed') }}" method="get">
                     <input type="hidden" name="offset" value="{{ offset + 20 }}">
-                    <button type="submit" class="btn btn-outline-primary">Voir 20 publications de plus</button>
+                    <button type="submit" class="btn btn-outline-primary">Voir 20 publications de plus →</button>
                 </form>
                 {% else %}
                 <small class="text-muted">Plus de posts à afficher.</small>
                 {% endif %}
             </div>   
+
         {% else %}
         <p>Aucun post à afficher. Suivez des utilisateurs pour voir leurs publications !</p>
         {% endif %}

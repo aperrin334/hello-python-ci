@@ -112,6 +112,7 @@ class CommentLike(db.Model):
 
 
 
+
 #créer les bases de données qui ne le sont pas déjà
 with app.app_context():
     db.create_all()
@@ -348,6 +349,38 @@ def like_comment(comment_id):
         db.session.add(new_like)
     db.session.commit()
     return redirect(request.referrer or url_for('profile'))
+
+@app.route('/delete_comment/<int:comment_id>', methods=['POST'])
+def delete_comment(comment_id):
+    if 'username' not in session:
+        flash("Vous devez être connecté·e pour supprimer un commentaire.", "error")
+        return redirect(url_for('login'))
+
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        flash("Commentaire introuvable.", "error")
+        return redirect(request.referrer or url_for('profile'))
+
+    current_user = User.query.filter_by(username=session['username']).first()
+    if not current_user:
+        flash("Utilisateur introuvable.", "error")
+        return redirect(url_for('login'))
+
+    # Vérifier que l'utilisateur connecté est bien l'auteur du commentaire
+    if comment.user_id != current_user.id:
+        flash("Vous n'êtes pas autorisé·e à supprimer ce commentaire.", "error")
+        return redirect(request.referrer or url_for('profile'))
+
+    # Supprimer les likes associés au commentaire
+    CommentLike.query.filter_by(comment_id=comment.id).delete()
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    flash("Commentaire supprimé.", "success")
+    return redirect(request.referrer or url_for('profile'))
+
+
 ##################
 
 ##########FOLLOWS/UNFOLLOWS

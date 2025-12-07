@@ -158,7 +158,7 @@
             <button 
                 type="submit" 
                 class="sidebar-btn">
-                ✏️ Modifier mon profil
+                Modifier mon profil
             </button>
         </form>
 
@@ -263,6 +263,11 @@
                                         {% if liked_comment %}❤️{% else %}🤍{% endif %} ({{ comment.likes | length }})
                                     </button>
                                 </form>
+                                {% if session.get('username') == comment.author.username %}
+                                <form action="{{ url_for('delete_comment', comment_id=comment.id) }}" method="POST" style="display:inline; margin-left:8px;">
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Supprimer ce commentaire ?');">Supprimer</button>
+                                </form>
+                                {% endif %}
                         </div>
                         {% endfor %}
                     </div>
